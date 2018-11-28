@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flow editor 0.0.1</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/mermaid@7.0.10/dist/mermaid.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <div id="menu">
+        <span id="title"><h1>Flow editor</h1><strong><a href="https://github.com/Didjeeh/floweditor" target="_blank">0.0.1</a></strong></span>
+        <span id="controls">
+            <input class="btn btn-outline-primary" type="file" id="open-file" accept=".sqlite3">
+            <span id="other-controls">
+                <button class="btn btn-primary" id="save-btn" type="button">Save</button>
+                <button class="btn btn-secundary" id="edit-btn" type="button">Toggle edit</button>
+                <button class="btn btn-secundary" id="close-help-btn" type="button" style="display: none">Close help</button>
+            </span>
+        </span>
+    </div>
+    <div id="container" class="container-fluid">
+        <div class="row">
+            <div id="edit-pane" class="col-lg-4" style="display: none">
+                <div id="edit-pane-head">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-light active">
+                            <input type="radio" name="options" id="definition-btn" autocomplete="off" checked>
+                            Definition
+                        </label>
+                        <label class="btn btn-light">
+                            <input type="radio" name="options" id="help-btn" autocomplete="off"> Help
+                        </label>
+                    </div>
+                    <button class="btn btn-link" id="cleanup-btn" type="button" style="display: none">Cleanup node
+                        names</button>
+                    <div id="graph-parse-error" style="display: none"></div>
+                </div>
+                <div id="graph-txt-wrapper">
+                    <textarea id="graph-txt"></textarea>
+                </div>
+            </div>
+            <div id="help-pane" class="col-lg-8" style="display: none">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script src="https://unpkg.com/mermaid@7.0.10/dist/mermaid.min.js"></script>
+    <script src="js/sql.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.0/dist/FileSaver.min.js" integrity="sha256-5Fv+LQlkb6dD3pAHzJb7FLI1iSqJE9GCza+HQtcI06k="
+        crossorigin="anonymous"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

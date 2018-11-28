@@ -1,0 +1,50 @@
+#title * {
+display: inline-block;
+}
+#title h1 {
+margin-right: 10px;
+}
+#menu {
+padding: 10px;
+position: fixed;
+width: 100%;
+background-color: ghostwhite;
+opacity: 0.97;
+z-index: 2;
+}
+#menu h1 {
+color: darkblue;
+display: inline;
+}
+#controls {
+margin-top: 10px;
+float: right;
+}
+#edit-pane-head {
+width: 100%;
+margin-bottom: 1px;
+}
+#graph-parse-error {
+font-family: "Courier New", Courier, monospace;
+font-size: 95%;
+color: white;
+background-color: darkorange;
+text-align: center;
+padding: 1px 0px;
+}
+#container {
+padding: 10px;
+top: 80px;
+position: relative;
+width: 99%;
+}
+#graph-div {
+text-align: center;
+}
+.nodes .node {
+color: black;
+cursor: pointer;
+}
+.edgeLabel {
+color: black;
+}
