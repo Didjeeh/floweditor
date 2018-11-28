@@ -1,6 +1,6 @@
 ![](screenshot.png)
 
-**Live demo [HERE](https://1n4da9gyqhto1wgjvlkpba-on.drv.tw/floweditordemo)**
+**Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
 *   2018-11-28: Release 0.0.1
@@ -14,7 +14,7 @@ Made out of HTML5, Javascript(jQuery), CSS and <3. No external calls other than 
 See the versions of these in the source of index.html.
 
 # How to use
-1.  Use the **Live demo [HERE](https://1n4da9gyqhto1wgjvlkpba-on.drv.tw/floweditordemo)**
+1.  Use the **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 2.  Or clone the repo and
 
     *   **host** it's content on a web server
