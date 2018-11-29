@@ -239,7 +239,7 @@ const bindNodeClick = () => {
             nodeHelp = '<div>' + marked(nodeHelp) + '</div>';
         }
 
-        nodeHelp = '<h2>' + $(this)[0].textContent + '</h2>' + nodeHelp;
+        nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>' + nodeHelp;
 
         $('#help-pane').html(nodeHelp);
         $('#graph-div').hide();
