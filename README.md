@@ -33,4 +33,3 @@ Creative Commons Attribution-Share Alike 3.0 Unported License
 *   Markdown parser: <https://marked.js.org>
 *   SQL helper: <https://github.com/kripken/sql.js>
 *   Saving (downloading) files: <https://github.com/eligrey/FileSaver.js>
-*   Putting it all together: myself! <https://www.linkedin.com/in/dietervandroemme>
