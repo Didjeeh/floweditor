@@ -20,6 +20,12 @@ display: inline;
 margin-top: 10px;
 float: right;
 }
+#edit-btn {
+margin-right: 10px;
+}
+#open-file-lbl {
+margin-top: 8px;
+}
 #edit-pane-head {
 width: 100%;
 margin-bottom: 1px;

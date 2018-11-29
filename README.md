@@ -1,4 +1,4 @@
-![](screenshot.png)
+![](screenshot.jpg)
 
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 

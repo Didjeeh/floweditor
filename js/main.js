@@ -21,22 +21,81 @@ let editState = editStates.graph;
 let errorText = '';
 let isEditPaneVisible = false;
 
-let definition = `a((E)) --> b(x) 
-b --> c{a}
-c -- yes --> d1(m)
-c -- no --> d2(p)
-d1 --> e(l)
-d2 --> e
-e --> f[e]`;
+let definition = `%% Hi there! I am a comment. Below a flow crash course.
+
+%% A node in flow is an **ID** + **label** encapsulated by (( )), ( ), [ ], { }.
+%% Nodes can be strung together using e.g. -->.
+%% For example:
+
+a(( Problem: out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO ) 
+
+%% When you click "node a" you will see the linked help. Click the **Help** button next to **Definition** to see how this works.
+
+b --> c{ Choice: Go to shop }
+c -- yes --> d1[ Hard edge: Eat hamburger ]
+c -- no --> d2[ Stay hungry ]`;
 let help = `a:
-This example links help to a node ID *a*. The node text is always the title of a help section.
+## Hi!
 
-Define nodes in *Definition*. This definition is a subset of what is described [here](https://mermaidjs.github.io/flowchart.html).
+Welcome to this little tool to make flows!
 
-Click a node in the flow to see the result.
+Like you already now, a flow is a way to structurize steps to be taken to come to a certain solution for a stated problem.
+
+What you see here is a very simplistic example, just to explain you how this works.
+
+When you are ready you can *close this help* by clicking the button in the upper-right corner: 
+
+![](https://imgur.com/8uza0v1.png)
+
+And you can *edit* and *save* this flow or *open another*.
+
+![](https://imgur.com/uIfLhzf.png)
+
+When you click the *Edit* button you will see following 2 buttons and an edit field.
+
+![](https://imgur.com/45boDAL.png)
+
+### Definition
+The definition defines the flow in a textual manner. This allows constructing flows fast.
+
+This might look complicated. But it's actually fairly straightforward. Just hang in there.
+
+---
+
+%% Hi there! I am a comment. Below a flow crash course.
+
+A node in flow is an **ID** + **label** encapsulated by (( )), ( ), [ ], { }.
+Nodes can be strung together using e.g. -->.
+For example:
+
+\`a(( Problem: out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO )\`
+
+---
+
+For all possibilities see <https://mermaidjs.github.io/flowchart.html>.
+
+### Help
+When you click *node a* you will see this linked help. The node label is always the title of a help section.
+
+Click **Close help**, **Edit** and the **Help** button next to **Definition** to edit the help.
+
+*Notice that this help text starts with **a:**. There is a **b:** and a **d:** as well.* You can wirte your own **c:** if you like.
+
+This example links help to a node with ID **a** and label *Problem: out of hamburgers - CLICK ME!* encapsulated by *(( ))*, *( )*, *[ ]*, *{ }*.
+
+Furthermore\\: *(1)*
+
+*   Click the next node \`b( Step: Get out of chair - CLICK ME TOO )\` to see how you can make headings, add lists and do other various styling.
+*   Be sure to checkout the other help for the last two nodes as well for node naming conventions.
+
+*(1) Notice the \\\\ to escape the ':'. Otherwise the editor thinks that 'Furthermore' is a node ID.*
 
 b:
+Click **Close help**, **Edit** and the **Help** button next to **Definition** to edit the help.
+
 Go ahead, play around with the editor! Be sure to check out **bold** and *italic* styling, or even [links](https://google.com). You can type the Markdown syntax, use the toolbar, or use shortcuts like \`cmd-b\` or \`ctrl-b\`.
+
+For a full Markdown overview: <https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet>. Below a short overview.
 
 ## Lists
 Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or \`+ \`. Ordered lists can be started by typing \`1. \`.
@@ -56,7 +115,16 @@ Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or
 
 *Source: <https://simplemde.com/>*
 
-d: When there is **no** help available for specific elements in a layer (*d1(m)* and *d2(p)* in layer *d*), the **layer-wise help** is shown, if any.`;
+c:
+
+d:
+**What?!** This help is the same for \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\` both?
+
+When there is **no** help available for specific elements in a layer (*d1(m)* and *d2(p)* in layer *d*), the **layer-wise help** is shown, if any.
+
+To make naming nodes easy you can use the following manner:
+
+![](https://imgur.com/JkATePW.png)`;
 let htmlHelp = {};
 //#endregion
 
@@ -134,6 +202,10 @@ const fillHtmlHelp = () => {
                 value = '\n\n';
             }
 
+            if (htmlHelp[key]) {
+                value = htmlHelp[key] + key + ':' + value;
+            }
+
             htmlHelp[key] = value;
         }
         else {
@@ -172,7 +244,7 @@ const bindNodeClick = () => {
         $('#help-pane').html(nodeHelp);
         $('#graph-div').hide();
         $('#save-btn').hide();
-        $('#open-file').hide();
+        $('#open-file-lbl').hide();
         $('#edit-btn').hide();
         $('#edit-pane').hide();
         $('#help-pane').fadeIn();
@@ -245,11 +317,31 @@ const delayRenderGraph = () => {
 //#endregion
 
 //#region menu
+const editBtnClick = () => {
+    if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
+        graphDivColumnClass = columnClasses.wide;
+        isEditPaneVisible = false;
+    }
+    else {
+        graphDivColumnClass = columnClasses.narrow;
+        isEditPaneVisible = true;
+    }
+    $('#edit-pane').toggle();
+
+    if (!wasEditPaneFirstTimeVisible) {
+        wasEditPaneFirstTimeVisible = true;
+        simplemde.value(definition);
+    }
+    simplemde.codemirror.refresh(); // Force refresh.
+    $('#graph-div')[0].className = graphDivColumnClass;
+    fixGraphDivDimensions();
+};
 const openFileChange = (e) => {
     let f = e.target.files[0];
     if (f) {
-        $('#open-file').prop('disabled', true);
-        $('#other-controls').hide();
+        $('#open-file-lbl').text('Opening...');
+        $('#controls').prop('disabled', true);
+        $('.other-controls').hide();
         if (isEditPaneVisible) {
             $('#edit-btn').trigger('click');
         }
@@ -279,8 +371,9 @@ const openFileChange = (e) => {
 
             simplemde.codemirror.refresh(); // Force refresh.
 
-            $('#open-file').prop('disabled', false);
-            $('#other-controls').fadeIn();
+            $('#open-file-lbl').text('Open');
+            $('#controls').prop('disabled', false);
+            $('.other-controls').fadeIn();
         }
         r.readAsArrayBuffer(f);
     }
@@ -290,36 +383,21 @@ const saveBtnClick = () => {
         return;
     }
 
+    $('#save-btn').text('Saving...');
+    $('#controls').prop('disabled', true);
     let db = new SQL.Database();
     db.run('CREATE TABLE flow (definition, help);');
     db.run('INSERT INTO flow VALUES (?,?)', [definition, help]);
     let blob = new Blob([db.export()], { type: 'application/octet-stream' });
-    saveAs(blob, 'db.sqlite3');
-};
-const editBtnClick = () => {
-    if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
-        graphDivColumnClass = columnClasses.wide;
-        isEditPaneVisible = false;
-    }
-    else {
-        graphDivColumnClass = columnClasses.narrow;
-        isEditPaneVisible = true;
-    }
-    $('#edit-pane').toggle();
-
-    if (!wasEditPaneFirstTimeVisible) {
-        wasEditPaneFirstTimeVisible = true;
-        simplemde.value(definition);
-        simplemde.codemirror.refresh(); // Force refresh.
-    }
-    $('#graph-div')[0].className = graphDivColumnClass;
-    fixGraphDivDimensions();
+    saveAs(blob, 'flow.sqlite3');
+    $('#save-btn').text('Save');
+    $('#controls').prop('disabled', false);
 };
 const closeHelpBtnClick = () => {
     $('#close-help-btn').hide();
     $('#edit-btn').show();
     $('#save-btn').show();
-    $('#open-file').show();
+    $('#open-file-lbl').show();
     $('#help-pane').hide();
 
     if (isEditPaneVisible) {
@@ -361,7 +439,7 @@ const main = () => {
 
     $("#graph-txt-wrapper .editor-toolbar").hide();
     simplemde.codemirror.on("changes", delayRenderGraph);
-    
+
 
     renderGraph();
 }

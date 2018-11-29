@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Flow editor 0.0.1</title>
+    <title>Flow editor 0.0.2</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -15,14 +15,17 @@
 
 <body>
     <div id="menu">
-        <span id="title"><h1>Flow editor</h1><strong><a href="https://github.com/Didjeeh/floweditor" target="_blank">0.0.1</a></strong></span>
+        <span id="title">
+            <h1>Flow editor</h1><strong><a href="https://github.com/Didjeeh/floweditor" target="_blank">0.0.2</a></strong>
+        </span>
         <span id="controls">
-            <input class="btn btn-outline-primary" type="file" id="open-file" accept=".sqlite3">
-            <span id="other-controls">
-                <button class="btn btn-primary" id="save-btn" type="button">Save</button>
-                <button class="btn btn-secundary" id="edit-btn" type="button">Toggle edit</button>
-                <button class="btn btn-secundary" id="close-help-btn" type="button" style="display: none">Close help</button>
-            </span>
+            <button class="btn btn-primary other-controls" id="edit-btn" type="button" data-toggle="button" aria-pressed="false">Edit</button>
+            <label id="open-file-lbl" class="btn btn-outline-primary" for="open-file">Open</label>
+            <input type="file" id="open-file" accept=".sqlite3" style="display: none">
+            <button class="btn btn-outline-primary other-controls" id="save-btn" type="button">Save</button>
+            <button class="btn btn-secundary" id="close-help-btn" type="button" style="display: none">Close
+                help</button>
+        </span>
         </span>
     </div>
     <div id="container" class="container-fluid">
