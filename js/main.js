@@ -27,7 +27,7 @@ let definition = `%% Hi there! I am a comment. Below a flow crash course.
 %% Nodes can be strung together using e.g. -->.
 %% For example:
 
-a(( Problem: out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO ) 
+a(( Problem: Out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO ) 
 
 %% When you click "node a" you will see the linked help. Click the **Help** button next to **Definition** to see how this works.
 
@@ -68,7 +68,7 @@ A node in flow is an **ID** + **label** encapsulated by (( )), ( ), [ ], { }.
 Nodes can be strung together using e.g. -->.
 For example:
 
-\`a(( Problem: out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO )\`
+\`a(( Problem: Out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of chair - CLICK ME TOO )\`
 
 ---
 
@@ -81,7 +81,7 @@ Click **Close help**, **Edit** and the **Help** button next to **Definition** to
 
 *Notice that this help text starts with **a:**. There is a **b:** and a **d:** as well.* You can wirte your own **c:** if you like.
 
-This example links help to a node with ID **a** and label *Problem: out of hamburgers - CLICK ME!* encapsulated by *(( ))*, *( )*, *[ ]*, *{ }*.
+This example links help to a node with ID **a** and label *Problem: Out of hamburgers - CLICK ME!* encapsulated by *(( ))*, *( )*, *[ ]*, *{ }*.
 
 Furthermore\\: *(1)*
 
