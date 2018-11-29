@@ -3,6 +3,7 @@
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
+*   2018-11-29: Release 0.0.2 - More user friendly
 *   2018-11-28: Release 0.0.1
 
 # Intro
