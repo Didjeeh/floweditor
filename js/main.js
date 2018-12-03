@@ -319,7 +319,7 @@ const bindNodeClick = () => {
         let nodeHelp = getNodeHelp(nodeId);
 
         if (nodeHelp === undefined) {
-            nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>' + nodeHelp;
+            nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>';
         }
         else {
             nodeHelp = marked(nodeHelp);
