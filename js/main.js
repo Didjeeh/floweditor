@@ -259,7 +259,7 @@ const preProcessGraph = (s) => {
     return s;
 };
 // Post process.
-const fixGraphDivDimensions = () => {
+const fixGraphDivAndEditorDimensions = () => {
     let graph = $('#graph-div')[0];
     let svg = graph.children[0];
     originalSvgWidth = svg.clientWidth;
@@ -269,6 +269,8 @@ const fixGraphDivDimensions = () => {
         $(svg).attr('style', `max-width: ${maxPercentSvgWidth}%;`);
     }
     $(svg).removeAttr('height');
+
+    $("#graph-txt-wrapper .CodeMirror").height($(svg).height() - 100);
 };
 // Post process.
 const fillHtmlHelp = () => {
@@ -375,7 +377,7 @@ const renderGraph = () => {
 
                     graph.innerHTML = svgCode;
 
-                    fixGraphDivDimensions();
+                    fixGraphDivAndEditorDimensions();
                     fillHtmlHelp();
                     bindNodeClick();
                 });
@@ -421,7 +423,7 @@ const editBtnClick = () => {
     }
     simplemde.codemirror.refresh(); // Force refresh.
     $('#graph-div')[0].className = graphDivColumnClass;
-    fixGraphDivDimensions();
+    fixGraphDivAndEditorDimensions();
 };
 const openFileChange = (e) => {
     let f = e.target.files[0];
