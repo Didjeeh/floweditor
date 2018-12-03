@@ -21,6 +21,7 @@ let originalSvgWidth;
 let editState = editStates.graph;
 let errorText = '';
 let isEditPaneVisible = false;
+let windowScrollY = 0;
 
 let definition = `%% Hi there! I am a comment. Below a flow crash course.
 
@@ -315,6 +316,8 @@ const fillHtmlHelp = () => {
 // Post process.
 const bindNodeClick = () => {
     $('#graph-diagram .nodes .node').click(function () {
+        windowScrollY = window.pageYOffset;
+
         let nodeId = $(this).attr('id');
         let nodeHelp = getNodeHelp(nodeId);
 
@@ -485,14 +488,11 @@ const closeHelpBtnClick = () => {
     $('#help-pane').hide();
 
     if (isEditPaneVisible) {
-        $('#edit-btn').trigger('click');
-    }
-    else {
-        graphDivColumnClass = columnClasses.wide;
-        $('#graph-div')[0].className = graphDivColumnClass;
-        fixGraphDivDimensions();
+        $('#edit-pane').show();
     }
     $('#graph-div').show();
+
+    window.scrollBy(0, windowScrollY);
 };
 const definitionBtnChange = () => {
     editState = editStates.graph;
