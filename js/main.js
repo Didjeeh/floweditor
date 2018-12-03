@@ -80,7 +80,7 @@ When you click *node a* you will see this linked help. The node label is always 
 
 Click **Close help**, **Edit** and the **Help** button next to **Definition** to edit the help.
 
-*Notice that this help text starts with **a:**. There is a **b:** and a **d:** as well.* You can wirte your own **c:** if you like.
+*Notice that this help text starts with **a:**. There is a **b:** and a **d:** as well.* You can write your own **c:** if you like.
 
 This example links help to a node with ID **a** and label *Problem: Out of hamburgers - CLICK ME!* encapsulated by *(( ))*, *( )*, *[ ]*, *{ }*.
 
