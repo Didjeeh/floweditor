@@ -1,5 +1,6 @@
 'use strict';
 //#region fields
+const alphabet = Array.from(Array(26), (e, i) => String.fromCharCode(i + 97)); // lowercase a..z
 const columnClasses = { wide: 'col-lg-12', narrow: 'col-lg-8', veryNarrow: 'col-lg-8' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
@@ -124,11 +125,99 @@ When there is **no** help available for specific elements in a layer (*d1(m)* an
 
 To make naming nodes easy you can use the following manner:
 
-![](https://imgur.com/JkATePW.png)`;
+![](https://imgur.com/JkATePW.png)
+
+Furthermore, you can link help to multiple nodes. You can notate as a list, e.g.:
+
+\`a,b,c1,d:\`
+
+or as a range (only layers!), e.g.:
+
+\`y..ac:\``;
+
 let htmlHelp = {};
 //#endregion
 
-const findLayerName = (nodeId) => {
+const getNodeHelp = (nodeId) => {
+    nodeId = nodeId.toLowerCase();
+    let nodeHelp = htmlHelp[nodeId];
+    let nodeLayer = '';
+    if (!nodeHelp) {
+        nodeLayer = findNodeLayer(nodeId);
+        let keys = Object.keys(htmlHelp);
+        // List and range
+        for (let i = 0; i != keys.length; i++) {
+            let key = keys[i];
+            if (key.indexOf(',' + nodeId) > 0 || key.indexOf(nodeId + ',') > -1) {
+                nodeHelp = htmlHelp[key];
+                break;
+            }
+            else if (key.search(/[a-z]+\.\.+[a-z]/) === 0) {
+                if (nodeLayerInRange(nodeLayer, key)) {
+                    nodeHelp = htmlHelp[key];
+                    break;
+                }
+            }
+        }
+    }
+    if (!nodeHelp) {
+        nodeHelp = htmlHelp[nodeLayer];
+    }
+
+    return nodeHelp;
+};
+// Lowercased only and following a, b, ..., z, aa, ab, ...
+const nodeLayerInRange = (layer, range) => {
+    let rangeSplit = range.split('..');
+    let startLayer = findNodeLayer(rangeSplit[0]);
+    let inclusiveEndLayer = findNodeLayer(rangeSplit[1]);
+
+    // Switch values if a > b.
+    let swtch = false;
+    if (startLayer.length > inclusiveEndLayer.length) {
+        swtch = true;
+    }
+    else if (startLayer.length === inclusiveEndLayer.length) {
+        for (let i = 0; i != startLayer.length; i++) {
+            let a = startLayer.charCodeAt(i);
+            let b = inclusiveEndLayer.charCodeAt(i);
+            if (a > b) {
+                swtch = true;
+                break;
+            }
+        }
+    }
+
+    if (swtch) {
+        let x = startLayer;
+        startLayer = inclusiveEndLayer;
+        inclusiveEndLayer = x;
+    }
+
+    // Find layer in the range
+    let prefix = '';
+    let start = 'a'.charCodeAt(0);
+    for (let i = 0; i != inclusiveEndLayer.length; i++) {
+        let a = start;
+        if (i < startLayer.length) {
+            a = startLayer.charCodeAt(i);
+        }
+        let b = inclusiveEndLayer.charCodeAt(i);
+
+        for (let j = a; j <= b; j++) {
+            let candidate = prefix + String.fromCharCode(j);
+            if (layer === candidate) {
+                return true;
+            }
+        }
+
+        prefix += 'a';
+    }
+
+    return false;
+};
+
+const findNodeLayer = (nodeId) => {
     let layerIdLength = nodeId.length;
     for (let i = nodeId.length - 1; i != -1; i--) {
         if (isNaN(nodeId[i])) {
@@ -192,7 +281,7 @@ const fillHtmlHelp = () => {
 
         let keys = Object.keys(htmlHelp);
         //Search first index of one or more numbers or letters followed by a :.
-        let objectSignatureIndex = kvpCandidate.search(/[a-zA-Z0-9_.-]+\:/);
+        let objectSignatureIndex = kvpCandidate.search(/[a-zA-Z0-9_.,-]+\:/);
         if (objectSignatureIndex === 0) {
             let indexOfSplitter = kvpCandidate.indexOf(':');
 
@@ -202,11 +291,11 @@ const fillHtmlHelp = () => {
                 value = '\n\n';
             }
 
-            if (htmlHelp[key]) {
+            if (htmlHelp[key.toLowerCase()]) {
                 value = htmlHelp[key] + key + ':' + value;
             }
 
-            htmlHelp[key] = value;
+            htmlHelp[key.toLowerCase()] = value;
         }
         else {
             if (keys.length === 0) {
@@ -227,10 +316,7 @@ const fillHtmlHelp = () => {
 const bindNodeClick = () => {
     $('#graph-diagram .nodes .node').click(function () {
         let nodeId = $(this).attr('id');
-        let nodeHelp = htmlHelp[nodeId];
-        if (!nodeHelp) {
-            nodeHelp = htmlHelp[findLayerName(nodeId)];
-        }
+        let nodeHelp = getNodeHelp(nodeId);
 
         if (nodeHelp === undefined) {
             nodeHelp = '';
@@ -238,7 +324,7 @@ const bindNodeClick = () => {
         else {
             nodeHelp = '<div>' + marked(nodeHelp) + '</div>';
         }
-
+    
         nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>' + nodeHelp;
 
         $('#help-pane').html(nodeHelp);
