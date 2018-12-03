@@ -252,6 +252,11 @@ const preProcessGraph = (s) => {
     s = element.textContent;
     element.textContent = '';
 
+    if(!s) {
+        s = `graph TD
+a((Nothing to see))`;
+    }
+
     if (!s.startsWith('graph ')) {
         s = 'graph TD\n' + s;
     }
@@ -368,7 +373,7 @@ const renderGraph = () => {
             });
 
             //Do not render empty definitions.
-            if (definition) {
+            if (graphDefinition) {
                 mermaidAPI.render('graph-diagram', graphDefinition, function (svgCode) {
                     let graph = document.createElement('div');
                     graph.className = graphDivColumnClass;
