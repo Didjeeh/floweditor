@@ -54,3 +54,8 @@ cursor: pointer;
 .edgeLabel {
 color: black;
 }
+.nodeSelected {
+    stroke-width: 5px !important;
+    fill: aliceblue !important;
+    stroke: lightblue !important;
+}

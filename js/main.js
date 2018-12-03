@@ -1,7 +1,7 @@
 'use strict';
 //#region fields
 const alphabet = Array.from(Array(26), (e, i) => String.fromCharCode(i + 97)); // lowercase a..z
-const columnClasses = { wide: 'col-lg-12', narrow: 'col-lg-8', veryNarrow: 'col-lg-8' };
+const columnClasses = { wide: 'col-lg-12', narrow: 'col-lg-8', veryNarrow: 'col-lg-4' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
 const loadingDefinition = `a((L))
@@ -22,6 +22,7 @@ let editState = editStates.graph;
 let errorText = '';
 let isEditPaneVisible = false;
 let windowScrollY = 0;
+let currentSelectedNodeDOM;
 
 let definition = `%% Hi there! I am a comment. Below a flow crash course.
 
@@ -252,7 +253,7 @@ const preProcessGraph = (s) => {
     s = element.textContent;
     element.textContent = '';
 
-    if(!s) {
+    if (!s) {
         s = `graph TD
 a((Nothing to see))`;
     }
@@ -335,8 +336,18 @@ const bindNodeClick = () => {
             nodeHelp = marked(nodeHelp);
         }
 
+        if (currentSelectedNodeDOM) {
+            currentSelectedNodeDOM.removeClass('nodeSelected');
+        }
+        currentSelectedNodeDOM = $($(this)[0].children[0]);
+        currentSelectedNodeDOM.addClass('nodeSelected');
+
+
         $('#help-pane').html(nodeHelp);
-        $('#graph-div').hide();
+        graphDivColumnClass = columnClasses.veryNarrow;
+        $('#graph-div')[0].className = graphDivColumnClass;
+
+
         $('#save-btn').hide();
         $('#open-file-lbl').hide();
         $('#edit-btn').hide();
@@ -496,8 +507,15 @@ const closeHelpBtnClick = () => {
 
     if (isEditPaneVisible) {
         $('#edit-pane').show();
+        graphDivColumnClass = columnClasses.narrow;
     }
-    $('#graph-div').show();
+    else {
+        graphDivColumnClass = columnClasses.wide;
+    }
+    if (currentSelectedNodeDOM) {
+        currentSelectedNodeDOM.removeClass('nodeSelected');
+    }
+    $('#graph-div')[0].className = graphDivColumnClass;
 
     window.scrollBy(0, windowScrollY);
 };
