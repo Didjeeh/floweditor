@@ -36,7 +36,7 @@ b --> c{ Choice: Go to shop }
 c -- yes --> d1[ Hard edge: Eat hamburger ]
 c -- no --> d2[ Stay hungry ]`;
 let help = `a:
-## Hi!
+# Hi!
 
 Welcome to this little tool to make flows!
 
@@ -56,7 +56,7 @@ When you click the *Edit* button you will see following 2 buttons and an edit fi
 
 ![](https://imgur.com/45boDAL.png)
 
-### Definition
+## Definition
 The definition defines the flow in a textual manner. This allows constructing flows fast.
 
 This might look complicated. But it's actually fairly straightforward. Just hang in there.
@@ -75,8 +75,8 @@ For example:
 
 For all possibilities see <https://mermaidjs.github.io/flowchart.html>.
 
-### Help
-When you click *node a* you will see this linked help. The node label is always the title of a help section.
+## Help
+When you click *node a* you will see this linked help. The node label is the title of a help section, if there is no help linked.
 
 Click **Close help**, **Edit** and the **Help** button next to **Definition** to edit the help.
 
@@ -92,6 +92,7 @@ Furthermore\\: *(1)*
 *(1) Notice the \\\\ to escape the ':'. Otherwise the editor thinks that 'Furthermore' is a node ID.*
 
 b:
+# Help in style
 Click **Close help**, **Edit** and the **Help** button next to **Definition** to edit the help.
 
 Go ahead, play around with the editor! Be sure to check out **bold** and *italic* styling, or even [links](https://google.com). You can type the Markdown syntax, use the toolbar, or use shortcuts like \`cmd-b\` or \`ctrl-b\`.
@@ -116,10 +117,9 @@ Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or
 
 *Source: <https://simplemde.com/>*
 
-c:
-
-d:
-**What?!** This help is the same for \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\` both?
+c,d:
+# Name-calling
+**What?!** This help is the same for \`c{ Choice: Go to shop }\`, \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\` both?
 
 When there is **no** help available for specific elements in a layer (*d1(m)* and *d2(p)* in layer *d*), the **layer-wise help** is shown, if any.
 
@@ -319,13 +319,11 @@ const bindNodeClick = () => {
         let nodeHelp = getNodeHelp(nodeId);
 
         if (nodeHelp === undefined) {
-            nodeHelp = '';
+            nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>' + nodeHelp;
         }
         else {
-            nodeHelp = '<div>' + marked(nodeHelp) + '</div>';
+            nodeHelp = marked(nodeHelp);
         }
-    
-        nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>' + nodeHelp;
 
         $('#help-pane').html(nodeHelp);
         $('#graph-div').hide();
