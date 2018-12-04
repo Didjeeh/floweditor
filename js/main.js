@@ -140,6 +140,7 @@ or as a range (only layers!), e.g.:
 let htmlHelp = {};
 //#endregion
 
+//#region help
 const getNodeHelp = (nodeId) => {
     nodeId = nodeId.toLowerCase();
     let nodeHelp = htmlHelp[nodeId];
@@ -218,7 +219,6 @@ const nodeLayerInRange = (layer, range) => {
 
     return false;
 };
-
 const findNodeLayer = (nodeId) => {
     let layerIdLength = nodeId.length;
     for (let i = nodeId.length - 1; i != -1; i--) {
@@ -229,6 +229,7 @@ const findNodeLayer = (nodeId) => {
     }
     return nodeId.substring(0, layerIdLength);
 };
+//#endregion
 
 // To make sure node Ids follow correct naming conventions. Not yet implemented.
 /*
@@ -276,7 +277,9 @@ const fixGraphDivAndEditorDimensions = () => {
     }
     $(svg).removeAttr('height');
 
-    $("#graph-txt-wrapper .CodeMirror").height($(svg).height() - 100);
+    if (!(simplemde.isSideBySideActive() || simplemde.isFullscreenActive())) {
+        $("#graph-txt-wrapper .CodeMirror").height($(svg).height() - 100);
+    }
 };
 // Post process.
 const fillHtmlHelp = () => {
@@ -323,7 +326,7 @@ const fillHtmlHelp = () => {
 };
 // Post process.
 const bindNodeClick = () => {
-    $('#graph-diagram .nodes .node').click(function () {        
+    $('#graph-diagram .nodes .node').click(function () {
         $('#help-pane').hide();
 
         windowScrollY = window.pageYOffset;
@@ -349,7 +352,7 @@ const bindNodeClick = () => {
         // behavior: smooth is not used because it results in a wrong offset of #nodeHelp.
         // There is no clean way to check when scrolling is finished.
         currentSelectedNode[0].scrollIntoView({ block: 'center' });
-  
+
         $('#help-pane').html(nodeHelp);
 
         graphDivColumnClass = columnClasses.veryNarrow;
@@ -361,9 +364,9 @@ const bindNodeClick = () => {
         $('#edit-pane').hide();
         $('#help-pane').fadeIn();
         $('#close-help-btn').show();
-        
-        $('#node-help-div').offset({top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left})
-    
+
+        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left })
+
         //$('#node-help-div::before').height($('#node-help-div').offset().top);
     });
 };
