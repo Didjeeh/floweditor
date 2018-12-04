@@ -22,7 +22,7 @@ let editState = editStates.graph;
 let errorText = '';
 let isEditPaneVisible = false;
 let windowScrollY = 0;
-let currentSelectedNodeDOM;
+let currentSelectedNode;
 
 let definition = `%% Hi there! I am a comment. Below a flow crash course.
 
@@ -323,7 +323,9 @@ const fillHtmlHelp = () => {
 };
 // Post process.
 const bindNodeClick = () => {
-    $('#graph-diagram .nodes .node').click(function () {
+    $('#graph-diagram .nodes .node').click(function () {        
+        $('#help-pane').hide();
+
         windowScrollY = window.pageYOffset;
 
         let nodeId = $(this).attr('id');
@@ -336,14 +338,18 @@ const bindNodeClick = () => {
             nodeHelp = marked(nodeHelp);
         }
 
-        if (currentSelectedNodeDOM) {
-            currentSelectedNodeDOM.removeClass('nodeSelected');
+        //To make selecting easier
+        nodeHelp = '<div id=\'nodeHelp\'>' + nodeHelp + '</div>';
+
+        if (currentSelectedNode) {
+            currentSelectedNode.removeClass('nodeSelected');
         }
-        currentSelectedNodeDOM = $($(this)[0].children[0]);
-        currentSelectedNodeDOM.addClass('nodeSelected');
-
-
+        currentSelectedNode = $($(this)[0].children[0]);
+        currentSelectedNode.addClass('nodeSelected');
+        currentSelectedNode[0].scrollIntoView({ block: "center" });
+  
         $('#help-pane').html(nodeHelp);
+
         graphDivColumnClass = columnClasses.veryNarrow;
         $('#graph-div')[0].className = graphDivColumnClass;
 
@@ -354,8 +360,12 @@ const bindNodeClick = () => {
         $('#edit-pane').hide();
         $('#help-pane').fadeIn();
         $('#close-help-btn').show();
+
+        
+        $('#nodeHelp').offset({top: window.pageYOffset + $('#help-pane').offset().top, left: $('#nodeHelp').offset().left})
     });
 };
+
 // Renders the graph svg from Definition and links the help to the nodes. 
 const renderGraph = () => {
     try {
@@ -512,8 +522,8 @@ const closeHelpBtnClick = () => {
     else {
         graphDivColumnClass = columnClasses.wide;
     }
-    if (currentSelectedNodeDOM) {
-        currentSelectedNodeDOM.removeClass('nodeSelected');
+    if (currentSelectedNode) {
+        currentSelectedNode.removeClass('nodeSelected');
     }
     $('#graph-div')[0].className = graphDivColumnClass;
 
