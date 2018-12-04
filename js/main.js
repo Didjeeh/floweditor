@@ -119,7 +119,7 @@ Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or
 
 *Source: <https://simplemde.com/>*
 
-c,d:
+c,d1,d2:
 # Name-calling
 **What?!** This help is the same for \`c{ Choice: Go to shop }\`, \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\` both?
 
