@@ -339,20 +339,21 @@ const bindNodeClick = () => {
         }
 
         //To make selecting easier
-        nodeHelp = '<div id=\'nodeHelp\'>' + nodeHelp + '</div>';
+        nodeHelp = '<div id=\'node-help-div\'>' + nodeHelp + '</div>';
 
         if (currentSelectedNode) {
             currentSelectedNode.removeClass('nodeSelected');
         }
         currentSelectedNode = $($(this)[0].children[0]);
         currentSelectedNode.addClass('nodeSelected');
-        currentSelectedNode[0].scrollIntoView({ block: "center" });
+        // behavior: smooth is not used because it results in a wrong offset of #nodeHelp.
+        // There is no clean way to check when scrolling is finished.
+        currentSelectedNode[0].scrollIntoView({ block: 'center' });
   
         $('#help-pane').html(nodeHelp);
 
         graphDivColumnClass = columnClasses.veryNarrow;
         $('#graph-div')[0].className = graphDivColumnClass;
-
 
         $('#save-btn').hide();
         $('#open-file-lbl').hide();
@@ -360,9 +361,10 @@ const bindNodeClick = () => {
         $('#edit-pane').hide();
         $('#help-pane').fadeIn();
         $('#close-help-btn').show();
-
         
-        $('#nodeHelp').offset({top: window.pageYOffset + $('#help-pane').offset().top, left: $('#nodeHelp').offset().left})
+        $('#node-help-div').offset({top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left})
+    
+        //$('#node-help-div::before').height($('#node-help-div').offset().top);
     });
 };
 

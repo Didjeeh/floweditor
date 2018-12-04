@@ -47,6 +47,14 @@ width: 99%;
 #graph-div {
 text-align: center;
 }
+/*
+#node-help-div::before {
+content: " ";
+display: block;
+height: 50px;
+background-image: linear-gradient(rgba(0,0,255, 0), rgba(0,0,255,0.05));
+}
+*/
 .nodes .node {
 color: black;
 cursor: pointer;
@@ -55,7 +63,7 @@ cursor: pointer;
 color: black;
 }
 .nodeSelected {
-    stroke-width: 5px !important;
-    fill: aliceblue !important;
-    stroke: lightblue !important;
+stroke-width: 5px !important;
+fill: aliceblue !important;
+stroke: lightblue !important;
 }

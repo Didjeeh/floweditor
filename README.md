@@ -3,8 +3,9 @@
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
-*   2018-11-29: Release 0.0.2 - More user friendly
-*   2018-11-28: Release 0.0.1
+*   2018-12-04: pre-0.0.3 - Help next to flow (needs some work)
+*   2018-11-29: 0.0.2 - More user friendly
+*   2018-11-28: 0.0.1
 
 # Intro
 A small tool to generate flows + help.
