@@ -121,7 +121,7 @@ Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or
 
 c,d1,d2:
 # Name-calling
-**What?!** This help is the same for \`c{ Choice: Go to shop }\`, \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\` both?
+**What?!** This help is the same for \`c{ Choice: Go to shop }\`, \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\`?
 
 When there is **no** help available for specific elements in a layer (*d1(m)* and *d2(p)* in layer *d*), the **layer-wise help** is shown, if any.
 
