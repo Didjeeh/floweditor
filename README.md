@@ -31,6 +31,6 @@ Creative Commons Attribution-Share Alike 3.0 Unported License
 *   Javascript stuff: <https://jquery.com>
 *   Flows: <https://mermaidjs.github.io>
 *   Mardkdown editor: <https://simplemde.com/> and <https://codemirror.net>
-*   Markdown parser: <https://marked.js.org>
+*   Markdown parser: <https://marked.js.org> and <http://showdownjs.com>
 *   SQL helper: <https://github.com/kripken/sql.js>
 *   Saving (downloading) files: <https://github.com/eligrey/FileSaver.js>
