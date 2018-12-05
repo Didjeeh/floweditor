@@ -14,6 +14,13 @@ g((g))`;
 
 let simplemde;
 
+let converter = new showdown.Converter({
+    'tables': true,
+    'strikethrough': true,
+    'simpleLineBreaks': true,
+    'requireSpaceBeforeHeadingText': true
+});
+
 let delayRenderingTimeout;
 let wasEditPaneFirstTimeVisible = false;
 let graphDivColumnClass = columnClasses.wide;
@@ -300,7 +307,7 @@ const fillHtmlHelp = () => {
             let key = kvpCandidate.substring(0, indexOfSplitter).trim();
             let value = kvpCandidate.substring(key.length + 1).trim();
             if (!value) {
-                value = '\n\n';
+                value = '\n';
             }
 
             if (htmlHelp[key.toLowerCase()]) {
@@ -317,9 +324,9 @@ const fillHtmlHelp = () => {
             let prevVal = htmlHelp[keys[keys.length - 1]];
             kvpCandidate = kvpCandidate.trim();
             if (!kvpCandidate) {
-                kvpCandidate = '\n\n';
+                kvpCandidate = '\n';
             }
-            prevVal += '\n\n' + kvpCandidate;
+            prevVal += '\n' + kvpCandidate;
             htmlHelp[keys[keys.length - 1]] = prevVal;
         }
     }
@@ -338,7 +345,7 @@ const bindNodeClick = () => {
             nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>';
         }
         else {
-            nodeHelp = marked(nodeHelp);
+            nodeHelp = converter.makeHtml(nodeHelp);
         }
 
         //To make selecting easier
@@ -557,12 +564,23 @@ const main = () => {
     $('#help-btn').change(helpBtnChange);
     //$('#cleanup-btn').click(cleanupNodeIds);
 
-    simplemde = new SimpleMDE({ element: $("#graph-txt")[0], spellChecker: false });
+    simplemde = new SimpleMDE({
+        element: $("#graph-txt")[0],
+        spellChecker: false,
+        toolbar: ['bold', 'italic', 'heading', 'horizontal-rule', '|',
+            'quote', 'unordered-list', 'ordered-list', 'table', '|',
+            'link', 'image', '|',
+            'side-by-side', 'fullscreen', '|',
+            'guide'
+        ]
+    });
     //Following gives Uncaught TypeError.  https://github.com/sparksuite/simplemde-markdown-editor/issues #727 
     //simplemde.codemirror.options.lineNumbers = true;
 
     $("#graph-txt-wrapper .editor-toolbar").hide();
     simplemde.codemirror.on("changes", delayRenderGraph);
+
+    //marked.setOptions({    });
 
 
     renderGraph();
