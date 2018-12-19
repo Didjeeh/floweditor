@@ -349,7 +349,7 @@ const bindNodeClick = () => {
         }
 
         //To make selecting easier
-        nodeHelp = '<div id=\'node-help-div\'>' + nodeHelp + '</div>';
+        nodeHelp = '<div id=\'node-help-div\'><label id=\'node-help-head\'>' + $(this).text() + '</label>' + nodeHelp + '</div>';
 
         if (currentSelectedNode) {
             currentSelectedNode.removeClass('nodeSelected');
@@ -377,7 +377,18 @@ const bindNodeClick = () => {
         //$('#node-help-div::before').height($('#node-help-div').offset().top);
     });
 };
+const bindNodeHover = () => {
+    $.each($('#graph-diagram .nodes .node'), (index, value) => {
+        let node = $(value);
+        node.attr('href', '#');
+        node.attr('data-toggle', 'tooltip');
+        node.attr('data-placement', 'left');
+        node.attr('data-delay', '{"show":"900", "hide":"300"}');
+        node.attr('title', node.attr('id'));
+    });
 
+    $('[data-toggle="tooltip"]').tooltip();
+};
 // Renders the graph svg from Definition and links the help to the nodes. 
 const renderGraph = () => {
     try {
@@ -418,6 +429,7 @@ const renderGraph = () => {
                     fixGraphDivAndEditorDimensions();
                     fillHtmlHelp();
                     bindNodeClick();
+                    bindNodeHover();
                 });
             }
         }
@@ -581,7 +593,6 @@ const main = () => {
     simplemde.codemirror.on("changes", delayRenderGraph);
 
     //marked.setOptions({    });
-
 
     renderGraph();
 }

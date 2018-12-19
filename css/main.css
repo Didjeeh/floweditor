@@ -47,14 +47,13 @@ width: 99%;
 #graph-div {
 text-align: center;
 }
-/*
-#node-help-div::before {
-content: " ";
+
+#node-help-head {
 display: block;
-height: 50px;
-background-image: linear-gradient(rgba(0,0,255, 0), rgba(0,0,255,0.05));
+border-bottom:1px dotted #323232;
+width:50%;
 }
-*/
+
 .nodes .node {
 color: black;
 cursor: pointer;

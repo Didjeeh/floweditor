@@ -3,6 +3,7 @@
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
+*   2018-12-19: 0.0.3 - Help next to flow and node tooltips
 *   2018-12-04: pre-0.0.3 - Help next to flow (needs some work)
 *   2018-11-29: 0.0.2 - More user friendly
 *   2018-11-28: 0.0.1
@@ -27,10 +28,10 @@ Sufficient help is provided in the app itself.
 # Credit
 *   Favicon: <https://www.iconfinder.com/icons/216628/flow_icon>, Daniel Bruce,
 Creative Commons Attribution-Share Alike 3.0 Unported License
-*   Visual styling: <https://getbootstrap.com>
-*   Javascript stuff: <https://jquery.com>
+*   Visual styling: <https://getbootstrap.com>, <https://popper.js.org>
 *   Flows: <https://mermaidjs.github.io>
 *   Mardkdown editor: <https://simplemde.com/> and <https://codemirror.net>
 *   Markdown parser: <https://marked.js.org> and <http://showdownjs.com>
 *   SQL helper: <https://github.com/kripken/sql.js>
 *   Saving (downloading) files: <https://github.com/eligrey/FileSaver.js>
+*   Other javascript stuff: <https://jquery.com>
