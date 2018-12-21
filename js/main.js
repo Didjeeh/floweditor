@@ -126,7 +126,7 @@ Unordered lists can be started using the toolbar or by typing \`* \`, \`- \`, or
 
 *Source: <https://simplemde.com/>*
 
-c,d1,d2:
+c, d:
 # Name-calling
 **What?!** This help is the same for \`c{ Choice: Go to shop }\`, \`d1[ Hard edge: Eat hamburger ]\` and \`d2[ Stay hungry ]\`?
 
@@ -145,97 +145,6 @@ or as a range (only layers!), e.g.:
 \`y..ac:\``;
 
 let htmlHelp = {};
-//#endregion
-
-//#region help
-const getNodeHelp = (nodeId) => {
-    nodeId = nodeId.toLowerCase();
-    let nodeHelp = htmlHelp[nodeId];
-    let nodeLayer = '';
-    if (!nodeHelp) {
-        nodeLayer = findNodeLayer(nodeId);
-        let keys = Object.keys(htmlHelp);
-        // List and range
-        for (let i = 0; i != keys.length; i++) {
-            let key = keys[i];
-            if (key.indexOf(',' + nodeId) > 0 || key.indexOf(nodeId + ',') > -1) {
-                nodeHelp = htmlHelp[key];
-                break;
-            }
-            else if (key.search(/[a-z]+\.\.+[a-z]/) === 0) {
-                if (nodeLayerInRange(nodeLayer, key)) {
-                    nodeHelp = htmlHelp[key];
-                    break;
-                }
-            }
-        }
-    }
-    if (!nodeHelp) {
-        nodeHelp = htmlHelp[nodeLayer];
-    }
-
-    return nodeHelp;
-};
-// Lowercased only and following a, b, ..., z, aa, ab, ...
-const nodeLayerInRange = (layer, range) => {
-    let rangeSplit = range.split('..');
-    let startLayer = findNodeLayer(rangeSplit[0]);
-    let inclusiveEndLayer = findNodeLayer(rangeSplit[1]);
-
-    // Switch values if a > b.
-    let swtch = false;
-    if (startLayer.length > inclusiveEndLayer.length) {
-        swtch = true;
-    }
-    else if (startLayer.length === inclusiveEndLayer.length) {
-        for (let i = 0; i != startLayer.length; i++) {
-            let a = startLayer.charCodeAt(i);
-            let b = inclusiveEndLayer.charCodeAt(i);
-            if (a > b) {
-                swtch = true;
-                break;
-            }
-        }
-    }
-
-    if (swtch) {
-        let x = startLayer;
-        startLayer = inclusiveEndLayer;
-        inclusiveEndLayer = x;
-    }
-
-    // Find layer in the range
-    let prefix = '';
-    let start = 'a'.charCodeAt(0);
-    for (let i = 0; i != inclusiveEndLayer.length; i++) {
-        let a = start;
-        if (i < startLayer.length) {
-            a = startLayer.charCodeAt(i);
-        }
-        let b = inclusiveEndLayer.charCodeAt(i);
-
-        for (let j = a; j <= b; j++) {
-            let candidate = prefix + String.fromCharCode(j);
-            if (layer === candidate) {
-                return true;
-            }
-        }
-
-        prefix += 'a';
-    }
-
-    return false;
-};
-const findNodeLayer = (nodeId) => {
-    let layerIdLength = nodeId.length;
-    for (let i = nodeId.length - 1; i != -1; i--) {
-        if (isNaN(nodeId[i])) {
-            break;
-        }
-        layerIdLength--;
-    }
-    return nodeId.substring(0, layerIdLength);
-};
 //#endregion
 
 // To make sure node Ids follow correct naming conventions. Not yet implemented.
@@ -271,123 +180,6 @@ a((Nothing to see))`;
     }
 
     return s;
-};
-// Post process.
-const fixGraphDivAndEditorDimensions = () => {
-    let graph = $('#graph-div')[0];
-    let svg = graph.children[0];
-    originalSvgWidth = svg.clientWidth;
-    let widthPercent = 100 * originalSvgWidth / graph.getBoundingClientRect().width;
-
-    if (widthPercent > maxPercentSvgWidth) {
-        $(svg).attr('style', `max-width: ${maxPercentSvgWidth}%;`);
-    }
-    $(svg).removeAttr('height');
-
-    if (!(simplemde.isSideBySideActive() || simplemde.isFullscreenActive())) {
-        $("#graph-txt-wrapper .CodeMirror").height($(svg).height() - 100);
-    }
-};
-// Post process.
-const fillHtmlHelp = () => {
-    let split = help.split(/[\n\r]/g);
-    htmlHelp = {};
-    for (let i = 0; i != split.length; i++) {
-        let kvpCandidate = split[i];
-        if (kvpCandidate) {
-            kvpCandidate = kvpCandidate.trim();
-        }
-
-        let keys = Object.keys(htmlHelp);
-        //Search first index of one or more numbers or letters followed by a :.
-        let objectSignatureIndex = kvpCandidate.search(/[a-zA-Z0-9_.,-]+\:/);
-        if (objectSignatureIndex === 0) {
-            let indexOfSplitter = kvpCandidate.indexOf(':');
-
-            let key = kvpCandidate.substring(0, indexOfSplitter).trim();
-            let value = kvpCandidate.substring(key.length + 1).trim();
-            if (!value) {
-                value = '\n';
-            }
-
-            if (htmlHelp[key.toLowerCase()]) {
-                value = htmlHelp[key] + key + ':' + value;
-            }
-
-            htmlHelp[key.toLowerCase()] = value;
-        }
-        else {
-            if (keys.length === 0) {
-                continue;
-            }
-
-            let prevVal = htmlHelp[keys[keys.length - 1]];
-            kvpCandidate = kvpCandidate.trim();
-            if (!kvpCandidate) {
-                kvpCandidate = '\n';
-            }
-            prevVal += '\n' + kvpCandidate;
-            htmlHelp[keys[keys.length - 1]] = prevVal;
-        }
-    }
-};
-// Post process.
-const bindNodeClick = () => {
-    $('#graph-diagram .nodes .node').click(function () {
-        $('#help-pane').hide();
-
-        windowScrollY = window.pageYOffset;
-
-        let nodeId = $(this).attr('id');
-        let nodeHelp = getNodeHelp(nodeId);
-
-        if (nodeHelp === undefined) {
-            nodeHelp = '<h1>' + $(this)[0].textContent + '</h1>';
-        }
-        else {
-            nodeHelp = converter.makeHtml(nodeHelp);
-        }
-
-        //To make selecting easier
-        nodeHelp = '<div id=\'node-help-div\'><label id=\'node-help-head\'>' + $(this).text() + '</label>' + nodeHelp + '</div>';
-
-        if (currentSelectedNode) {
-            currentSelectedNode.removeClass('nodeSelected');
-        }
-        currentSelectedNode = $($(this)[0].children[0]);
-        currentSelectedNode.addClass('nodeSelected');
-        // behavior: smooth is not used because it results in a wrong offset of #nodeHelp.
-        // There is no clean way to check when scrolling is finished.
-        currentSelectedNode[0].scrollIntoView({ block: 'center' });
-
-        $('#help-pane').html(nodeHelp);
-
-        graphDivColumnClass = columnClasses.veryNarrow;
-        $('#graph-div')[0].className = graphDivColumnClass;
-
-        $('#save-btn').hide();
-        $('#open-file-lbl').hide();
-        $('#edit-btn').hide();
-        $('#edit-pane').hide();
-        $('#help-pane').fadeIn();
-        $('#close-help-btn').show();
-
-        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left })
-
-        //$('#node-help-div::before').height($('#node-help-div').offset().top);
-    });
-};
-const bindNodeHover = () => {
-    $.each($('#graph-diagram .nodes .node'), (index, value) => {
-        let node = $(value);
-        node.attr('href', '#');
-        node.attr('data-toggle', 'tooltip');
-        node.attr('data-placement', 'left');
-        node.attr('data-delay', '{"show":"900", "hide":"300"}');
-        node.attr('title', node.attr('id'));
-    });
-
-    $('[data-toggle="tooltip"]').tooltip();
 };
 // Renders the graph svg from Definition and links the help to the nodes. 
 const renderGraph = () => {
@@ -452,6 +244,222 @@ const delayRenderGraph = () => {
 
     clearTimeout(delayRenderingTimeout);
     delayRenderingTimeout = setTimeout(renderGraph, 200);
+};
+// Post process.
+const fixGraphDivAndEditorDimensions = () => {
+    let graph = $('#graph-div')[0];
+    let svg = graph.children[0];
+    originalSvgWidth = svg.clientWidth;
+    let widthPercent = 100 * originalSvgWidth / graph.getBoundingClientRect().width;
+
+    if (widthPercent > maxPercentSvgWidth) {
+        $(svg).attr('style', `max-width: ${maxPercentSvgWidth}%;`);
+    }
+    $(svg).removeAttr('height');
+
+    if (!(simplemde.isSideBySideActive() || simplemde.isFullscreenActive())) {
+        $("#graph-txt-wrapper .CodeMirror").height($(svg).height() - 100);
+    }
+};
+const fillHtmlHelp = () => {
+    htmlHelp = {};
+    let split = help.split(/[\n\r]/g);
+    let lastNodeIds = [];
+    for (let i = 0; i != split.length; i++) {
+        let kvpCandidate = split[i];
+        if (kvpCandidate) {
+            kvpCandidate = kvpCandidate.trim();
+        }
+
+        //Search first index of one or more numbers or letters followed by a :.
+        let objectSignatureIndex = kvpCandidate.search(/[ \ta-zA-Z0-9_.,-]+\:/);
+        if (objectSignatureIndex === 0) {
+            let indexOfSplitter = kvpCandidate.indexOf(':');
+
+            let key = kvpCandidate.substring(0, indexOfSplitter).trim();
+
+            let nodeIds = findNodeIdsForHelp(key);
+            if (nodeIds.length) {
+                lastNodeIds = nodeIds;
+            }
+            if (lastNodeIds) {
+                let value = kvpCandidate.substring(key.length + 1).trim();
+                if (!value) {
+                    value = '\n';
+                }
+
+                let nodeId = lastNodeIds[0];
+                if (htmlHelp[nodeId]) { // Add as text to existing
+                    value = htmlHelp[nodeId] + key + ':' + value;
+                }
+
+                for (let i = 0; i != lastNodeIds.length; i++) {
+                    htmlHelp[lastNodeIds[i]] = value;
+                }
+            }
+        }
+        else {
+            let value;
+            if (lastNodeIds) {
+                value = htmlHelp[lastNodeIds[0]];
+                if (!kvpCandidate) {
+                    kvpCandidate = '\n';
+                }
+                value += '\n' + kvpCandidate;
+            }
+            for (let i = 0; i != lastNodeIds.length; i++) {
+                htmlHelp[lastNodeIds[i]] = value;
+            }
+        }
+    }
+};
+// Returns lower cased node ids when found. Works for layers and ranges.
+const findNodeIdsForHelp = (helpKey) => {
+    let nodeIds = [];
+    helpKey = helpKey.replace(/ |\t/g, '').toLowerCase();
+    $.each($('#graph-diagram .nodes .node'), (index, value) => {
+        let nodeId = $(value).attr('id').toLowerCase();
+        if (nodeIds.indexOf(nodeId) > -1) {
+            return;
+        }
+
+        if (nodeId == helpKey) {
+            nodeIds.push(nodeId);
+            return;
+        }
+
+        if (helpKey.indexOf(',' + nodeId) > 0 || helpKey.indexOf(nodeId + ',') > -1) {
+            nodeIds.push(nodeId);
+            return;
+        }
+
+        let nodeLayer = findNodeLayer(nodeId);
+        if (helpKey.indexOf(',' + nodeLayer) > 0 || helpKey.indexOf(nodeLayer + ',') > -1) {
+            nodeIds.push(nodeId);
+            return;
+        }
+
+        if (helpKey.search(/[a-z]+\.\.+[a-z]/) === 0) {
+            if (nodeLayerInRange(nodeLayer, helpKey)) {
+                nodeIds.push(nodeId);
+            }
+            return;
+        }
+
+    });
+    return nodeIds;
+}
+// Lowercased only and following a, b, ..., z, aa, ab, ...
+const nodeLayerInRange = (layer, range) => {
+    let rangeSplit = range.split('..');
+    let startLayer = findNodeLayer(rangeSplit[0]);
+    let inclusiveEndLayer = findNodeLayer(rangeSplit[1]);
+
+    // Switch values if a > b.
+    let swtch = false;
+    if (startLayer.length > inclusiveEndLayer.length) {
+        swtch = true;
+    }
+    else if (startLayer.length === inclusiveEndLayer.length) {
+        for (let i = 0; i != startLayer.length; i++) {
+            let a = startLayer.charCodeAt(i);
+            let b = inclusiveEndLayer.charCodeAt(i);
+            if (a > b) {
+                swtch = true;
+                break;
+            }
+        }
+    }
+
+    if (swtch) {
+        let x = startLayer;
+        startLayer = inclusiveEndLayer;
+        inclusiveEndLayer = x;
+    }
+
+    // Find layer in the range
+    let prefix = '';
+    let start = 'a'.charCodeAt(0);
+    for (let i = 0; i != inclusiveEndLayer.length; i++) {
+        let a = start;
+        if (i < startLayer.length) {
+            a = startLayer.charCodeAt(i);
+        }
+        let b = inclusiveEndLayer.charCodeAt(i);
+
+        for (let j = a; j <= b; j++) {
+            let candidate = prefix + String.fromCharCode(j);
+            if (layer === candidate) {
+                return true;
+            }
+        }
+
+        prefix += 'a';
+    }
+
+    return false;
+};
+const findNodeLayer = (nodeId) => {
+    let layerIdLength = nodeId.length;
+    for (let i = nodeId.length - 1; i != -1; i--) {
+        if (isNaN(nodeId[i])) {
+            break;
+        }
+        layerIdLength--;
+    }
+    return nodeId.substring(0, layerIdLength);
+};
+const bindNodeClick = () => {
+    $('#graph-diagram .nodes .node').click(function () {
+        $('#help-pane').hide();
+
+        windowScrollY = window.pageYOffset;
+
+        let nodeId = $(this).attr('id');
+        let nodeHelp = htmlHelp[nodeId.toLowerCase()];;
+
+        //To make selecting easier
+        nodeHelp = '<div id=\'node-help-div\'><label id=\'node-help-head\'>' + $(this).text() + '</label>' +
+         (nodeHelp === undefined ? '' : converter.makeHtml(nodeHelp)) + 
+         '</div>';
+
+        if (currentSelectedNode) {
+            currentSelectedNode.removeClass('nodeSelected');
+        }
+        currentSelectedNode = $($(this)[0].children[0]);
+        currentSelectedNode.addClass('nodeSelected');
+        // behavior: smooth is not used because it results in a wrong offset of #nodeHelp.
+        // There is no clean way to check when scrolling is finished.
+        currentSelectedNode[0].scrollIntoView({ block: 'center' });
+
+        $('#help-pane').html(nodeHelp);
+
+        graphDivColumnClass = columnClasses.veryNarrow;
+        $('#graph-div')[0].className = graphDivColumnClass;
+
+        $('#save-btn').hide();
+        $('#open-file-lbl').hide();
+        $('#edit-btn').hide();
+        $('#edit-pane').hide();
+        $('#help-pane').fadeIn();
+        $('#close-help-btn').show();
+
+        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left })
+
+        //$('#node-help-div::before').height($('#node-help-div').offset().top);
+    });
+};
+const bindNodeHover = () => {
+    $.each($('#graph-diagram .nodes .node'), (index, value) => {
+        let node = $(value);
+        node.attr('href', '#');
+        node.attr('data-toggle', 'tooltip');
+        node.attr('data-placement', 'left');
+        node.attr('data-delay', '{"show":"900", "hide":"300"}');
+        node.attr('title', node.attr('id'));
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
 };
 //#endregion
 
