@@ -1,7 +1,6 @@
 'use strict';
 //#region fields
-const alphabet = Array.from(Array(26), (e, i) => String.fromCharCode(i + 97)); // lowercase a..z
-const columnClasses = { wide: 'col-lg-12', narrow: 'col-lg-8', veryNarrow: 'col-lg-4' };
+const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6'  };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
 const loadingDefinition = `a((L))
@@ -23,7 +22,7 @@ let converter = new showdown.Converter({
 
 let delayRenderingTimeout;
 let wasEditPaneFirstTimeVisible = false;
-let graphDivColumnClass = columnClasses.wide;
+let graphDivColumnClass = columnClasses.full;
 let originalSvgWidth;
 let editState = editStates.graph;
 let errorText = '';
@@ -466,7 +465,7 @@ const bindNodeHover = () => {
 //#region menu
 const editBtnClick = () => {
     if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
-        graphDivColumnClass = columnClasses.wide;
+        graphDivColumnClass = columnClasses.full;
         isEditPaneVisible = false;
     }
     else {
@@ -552,7 +551,7 @@ const closeHelpBtnClick = () => {
         graphDivColumnClass = columnClasses.narrow;
     }
     else {
-        graphDivColumnClass = columnClasses.wide;
+        graphDivColumnClass = columnClasses.full;
     }
     if (currentSelectedNode) {
         currentSelectedNode.removeClass('nodeSelected');
