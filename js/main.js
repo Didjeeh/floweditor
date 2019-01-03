@@ -581,6 +581,7 @@ const closeHelpBtnClick = () => {
         currentSelectedNodeId = null;
     }
     $('#graph-div')[0].className = graphDivColumnClass;
+    fixGraphDivAndEditorDimensions();
 
     window.scrollBy(0, windowScrollY);
 };
