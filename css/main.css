@@ -10,7 +10,7 @@ position: fixed;
 width: 100%;
 background-color: ghostwhite;
 opacity: 0.97;
-z-index: 2;
+z-index: 3;
 }
 #menu h1 {
 color: darkblue;
@@ -44,16 +44,22 @@ top: 80px;
 position: relative;
 width: 99%;
 }
+#size-controls {
+position: fixed;
+top: 88px;
+right: 20px;
+background-color: #FFF;
+opacity: 0.97;
+z-index: 2;
+}
 #graph-div {
 text-align: center;
 }
-
 #node-help-head {
 display: block;
 border-bottom:1px dotted #323232;
 width:50%;
 }
-
 .nodes .node {
 color: black;
 cursor: pointer;

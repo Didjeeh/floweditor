@@ -23,12 +23,15 @@ let converter = new showdown.Converter({
 let delayRenderingTimeout;
 let wasEditPaneFirstTimeVisible = false;
 let graphDivColumnClass = columnClasses.full;
+let graphDivColumnClassSized = columnClasses.half;
+let otherColumnClassSized = columnClasses.half;
 let originalSvgWidth;
 let editState = editStates.graph;
 let errorText = '';
 let isEditPaneVisible = false;
 let windowScrollY = 0;
 let currentSelectedNode;
+let currentSelectedNodeId;
 
 let definition = `%% Hi there! I am a comment. Below a flow crash course.
 
@@ -411,6 +414,7 @@ const findNodeLayer = (nodeId) => {
 const bindNodeClick = () => {
     $('#graph-diagram .nodes .node').click(function () {
         $('#help-pane').hide();
+        $('[data-toggle="tooltip"]').tooltip('dispose');
 
         windowScrollY = window.pageYOffset;
 
@@ -425,6 +429,7 @@ const bindNodeClick = () => {
         if (currentSelectedNode) {
             currentSelectedNode.removeClass('nodeSelected');
         }
+        currentSelectedNodeId = $(this)[0].id;
         currentSelectedNode = $($(this)[0].children[0]);
         currentSelectedNode.addClass('nodeSelected');
         // behavior: smooth is not used because it results in a wrong offset of #nodeHelp.
@@ -433,8 +438,10 @@ const bindNodeClick = () => {
 
         $('#help-pane').html(nodeHelp);
 
-        graphDivColumnClass = columnClasses.veryNarrow;
+        graphDivColumnClass = graphDivColumnClassSized;
         $('#graph-div')[0].className = graphDivColumnClass;
+        $('#edit-pane')[0].className = otherColumnClassSized;
+        $('#help-pane')[0].className = otherColumnClassSized;
 
         $('#save-btn').hide();
         $('#open-file-lbl').hide();
@@ -442,15 +449,14 @@ const bindNodeClick = () => {
         $('#edit-pane').hide();
         $('#help-pane').fadeIn();
         $('#close-help-btn').show();
+        $('#size-controls').show();
 
-        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left })
-
-        //$('#node-help-div::before').height($('#node-help-div').offset().top);
+        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left });
     });
 };
 // Only when editting
 const bindNodeHover = () => {
-    if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
+    if (isEditPaneVisible) {
         $.each($('#graph-diagram .nodes .node'), (index, value) => {
             let node = $(value);
 
@@ -469,12 +475,19 @@ const bindNodeHover = () => {
 const editBtnClick = () => {
     if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
         graphDivColumnClass = columnClasses.full;
-        isEditPaneVisible = false;
-        
+
         $('[data-toggle="tooltip"]').tooltip('dispose');
+        $('#size-controls').hide();
+
+        isEditPaneVisible = false;
     }
     else {
-        graphDivColumnClass = columnClasses.narrow;
+        graphDivColumnClass = graphDivColumnClassSized;
+        $('#edit-pane')[0].className = otherColumnClassSized;
+        $('#help-pane')[0].className = otherColumnClassSized;
+
+        $('#size-controls').show();
+
         isEditPaneVisible = true;
     }
     $('#edit-pane').toggle();
@@ -552,14 +565,20 @@ const closeHelpBtnClick = () => {
     $('#help-pane').hide();
 
     if (isEditPaneVisible) {
+        graphDivColumnClass = graphDivColumnClassSized;
+        $('#edit-pane')[0].className = otherColumnClassSized;
+        $('#help-pane')[0].className = otherColumnClassSized;
+
         $('#edit-pane').show();
-        graphDivColumnClass = columnClasses.narrow;
+        $('#size-controls').show();
     }
     else {
         graphDivColumnClass = columnClasses.full;
+        $('#size-controls').hide();
     }
     if (currentSelectedNode) {
         currentSelectedNode.removeClass('nodeSelected');
+        currentSelectedNodeId = null;
     }
     $('#graph-div')[0].className = graphDivColumnClass;
 
@@ -579,10 +598,38 @@ const helpBtnChange = () => {
 };
 //#endregion
 
+const size = (leftColumnClass, rightColumnClass) => {
+    graphDivColumnClassSized = leftColumnClass;
+    otherColumnClassSized = rightColumnClass;
+    graphDivColumnClass = graphDivColumnClassSized;
+
+    renderGraph();
+
+    if (currentSelectedNodeId) {
+        currentSelectedNode = $($('#' + currentSelectedNodeId)[0].children[0]);
+        currentSelectedNode.addClass('nodeSelected');
+
+        currentSelectedNode[0].scrollIntoView({ block: 'center' });
+    }
+
+    $('#edit-pane')[0].className = otherColumnClassSized;
+    $('#help-pane')[0].className = otherColumnClassSized;
+
+    // Workaround for the toggle button active states to work as they should.
+    setTimeout(() => {
+        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left });
+    }, 10);
+};
+
 const main = () => {
     $('#open-file').change(openFileChange);
     $('#save-btn').click(saveBtnClick);
     $('#edit-btn').click(editBtnClick);
+
+    $('#small-column-left').change(() => { size(columnClasses.veryNarrow, columnClasses.narrow) });
+    $('#equal-sized-columns').change(() => { size(columnClasses.half, columnClasses.half) });
+    $('#small-column-right').change(() => { size(columnClasses.narrow, columnClasses.veryNarrow) });
+
     $('#close-help-btn').click(closeHelpBtnClick);
     $('#definition-btn').change(definitionBtnChange);
     $('#help-btn').change(helpBtnChange);
