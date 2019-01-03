@@ -1,6 +1,6 @@
 'use strict';
 //#region fields
-const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6'  };
+const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
 const loadingDefinition = `a((L))
@@ -419,8 +419,8 @@ const bindNodeClick = () => {
 
         //To make selecting easier
         nodeHelp = '<div id=\'node-help-div\'><label id=\'node-help-head\'>' + $(this).text() + '</label>' +
-         (nodeHelp === undefined ? '' : converter.makeHtml(nodeHelp)) + 
-         '</div>';
+            (nodeHelp === undefined ? '' : converter.makeHtml(nodeHelp)) +
+            '</div>';
 
         if (currentSelectedNode) {
             currentSelectedNode.removeClass('nodeSelected');
@@ -448,17 +448,20 @@ const bindNodeClick = () => {
         //$('#node-help-div::before').height($('#node-help-div').offset().top);
     });
 };
+// Only when editting
 const bindNodeHover = () => {
-    $.each($('#graph-diagram .nodes .node'), (index, value) => {
-        let node = $(value);
-        node.attr('href', '#');
-        node.attr('data-toggle', 'tooltip');
-        node.attr('data-placement', 'left');
-        node.attr('data-delay', '{"show":"900", "hide":"300"}');
-        node.attr('title', node.attr('id'));
-    });
+    if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
+        $.each($('#graph-diagram .nodes .node'), (index, value) => {
+            let node = $(value);
 
-    $('[data-toggle="tooltip"]').tooltip();
+            node.attr('href', '#');
+            node.attr('data-toggle', 'tooltip');
+            node.attr('data-placement', 'left');
+            node.attr('data-delay', '{"show":"900", "hide":"300"}');
+            node.attr('title', node.attr('id'));
+        });
+        $('[data-toggle="tooltip"]').tooltip();
+    }
 };
 //#endregion
 
@@ -467,6 +470,8 @@ const editBtnClick = () => {
     if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
         graphDivColumnClass = columnClasses.full;
         isEditPaneVisible = false;
+        
+        $('[data-toggle="tooltip"]').tooltip('dispose');
     }
     else {
         graphDivColumnClass = columnClasses.narrow;
