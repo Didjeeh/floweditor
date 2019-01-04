@@ -585,20 +585,6 @@ const closeHelpBtnClick = () => {
 
     window.scrollBy(0, windowScrollY);
 };
-const definitionBtnChange = () => {
-    editState = editStates.graph;
-    $("#graph-txt-wrapper .editor-toolbar").hide();
-    simplemde.value(definition);
-    simplemde.codemirror.refresh(); // Force refresh.
-};
-const helpBtnChange = () => {
-    editState = editStates.help;
-    $("#graph-txt-wrapper .editor-toolbar").show();
-    simplemde.value(help);
-    simplemde.codemirror.refresh();  // Force refresh.
-};
-//#endregion
-
 const size = (leftColumnClass, rightColumnClass) => {
     graphDivColumnClassSized = leftColumnClass;
     otherColumnClassSized = rightColumnClass;
@@ -621,6 +607,19 @@ const size = (leftColumnClass, rightColumnClass) => {
         $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left });
     }, 10);
 };
+const definitionBtnChange = () => {
+    editState = editStates.graph;
+    $("#graph-txt-wrapper .editor-toolbar").hide();
+    simplemde.value(definition);
+    simplemde.codemirror.refresh(); // Force refresh.
+};
+const helpBtnChange = () => {
+    editState = editStates.help;
+    $("#graph-txt-wrapper .editor-toolbar").show();
+    simplemde.value(help);
+    simplemde.codemirror.refresh();  // Force refresh.
+};
+//#endregion
 
 const main = () => {
     $('#open-file').change(openFileChange);
