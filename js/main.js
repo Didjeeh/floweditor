@@ -1,5 +1,6 @@
 'use strict';
 //#region fields
+const alphabeth = 'abcdefghijklmnopqrstuvwxyz';
 const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
@@ -149,14 +150,70 @@ or as a range (only layers!), e.g.:
 let htmlHelp = {};
 //#endregion
 
-// To make sure node Ids follow correct naming conventions. Not yet implemented.
-/*
+// To make sure node Ids follow correct naming conventions. Only for graph TD
 const cleanupNodeIds = () => {
+    let layerIndex = 0;
+    let nodeIndexInLayer = 1;
+    let prevLayerY = 0;
+    let nodeIdMap = {}; //old to new
+    let newLayersAndOldIds = {}; //For omitting node indexes in layer if only one node in a layer.
     $('#graph-diagram .nodes .node').each(function (index) {
+        let nodeId = $(this)[0].id;
+        let layerY = $(this).attr('transform').split(",")[1];
+        layerY = layerY.substring(0, layerY.length - 1);
+
+        if (layerY === prevLayerY) {
+            ++nodeIndexInLayer;
+        }
+        else {
+            nodeIndexInLayer = 1;
+            ++layerIndex;
+        }
+
+        let newLayer = layerIndexToLayer(layerIndex);
+        let newId = newLayer + nodeIndexInLayer;
+
+        if (nodeId != newId) {
+            nodeIdMap[nodeId] = newId;
+            newLayersAndOldIds[newLayer] = [];
+            newLayersAndOldIds[newLayer].push(nodeId);
+        }
+
+        prevLayerY = layerY;
     });
-    renderGraph();
+
+    //Omit node indexes in layer if only one node in a layer.
+    for (let i = 0; i != newLayersAndOldIds.length; i++) {
+        let layer = Object.keys(newLayersAndOldIds)[i];
+        let oldIds = newLayersAndOldIds[layer];
+        if (oldIds.length === 1) {
+            let oldId = oldIds[0];
+            if (oldId === layer) {
+                delete nodeIdMap[oldId];
+            }
+            else {
+                nodeIdMap[oldId] = layer;
+            }
+        }
+    }
+
+    //renderGraph();
 };
-*/
+
+//max zz (26*26 layers), layerIndex --> 1 based
+const layerIndexToLayer = (layerIndex) => {
+    let layer = '';
+    let l1Index = Math.floor(layerIndex / 26);
+    let l2Index = (layerIndex % 26);
+
+    if (l1Index != 0) {
+        layer = alphabeth[l1Index - 1];
+    }
+
+    layer += alphabeth[l2Index - 1];
+
+    return layer;
+};
 
 //#region rendering
 const preProcessGraph = (s) => {
@@ -654,6 +711,8 @@ const main = () => {
     //marked.setOptions({    });
 
     renderGraph();
+
+    $('#test-btn').click(cleanupNodeIds);
 }
 
 $(document).ready(main);
