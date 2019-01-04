@@ -151,11 +151,11 @@ let htmlHelp = {};
 //#endregion
 
 // To make sure node Ids follow correct naming conventions. Only for graph TD
-const cleanupNodeIds = () => {
+const getoldToNewNodeIdMap = () => {
     let layerIndex = 0;
     let nodeIndexInLayer = 1;
     let prevLayerY = 0;
-    let nodeIdMap = {}; //old to new
+    let oldToNewNodeIdMap = {};
     let newLayersAndOldIds = {}; //For omitting node indexes in layer if only one node in a layer.
     $('#graph-diagram .nodes .node').each(function (index) {
         let nodeId = $(this)[0].id;
@@ -174,7 +174,7 @@ const cleanupNodeIds = () => {
         let newId = newLayer + nodeIndexInLayer;
 
         if (nodeId != newId) {
-            nodeIdMap[nodeId] = newId;
+            oldToNewNodeIdMap[nodeId] = newId;
             newLayersAndOldIds[newLayer] = [];
             newLayersAndOldIds[newLayer].push(nodeId);
         }
@@ -189,15 +189,15 @@ const cleanupNodeIds = () => {
         if (oldIds.length === 1) {
             let oldId = oldIds[0];
             if (oldId === layer) {
-                delete nodeIdMap[oldId];
+                delete oldToNewNodeIdMap[oldId];
             }
             else {
-                nodeIdMap[oldId] = layer;
+                oldToNewNodeIdMap[oldId] = layer;
             }
         }
     }
 
-    //renderGraph();
+    return oldToNewNodeIdMap;
 };
 
 //max zz (26*26 layers), layerIndex --> 1 based
