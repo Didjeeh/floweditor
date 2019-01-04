@@ -1,6 +1,7 @@
 'use strict';
 //#region fields
 const alphabeth = 'abcdefghijklmnopqrstuvwxyz';
+const edgePathDelimiters = [['(', ')'], ['{', '}'], ['[', ']'], ['>', ']'], ['-'], ['='], ['|']];
 const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
@@ -150,6 +151,30 @@ or as a range (only layers!), e.g.:
 let htmlHelp = {};
 //#endregion
 
+const cleanupNodeIds = () => {
+    let newDefinition = '';
+    let oldToNewNodeIdMap = getoldToNewNodeIdMap();
+
+    let split = definition.split(/[\n\r]/g);
+    for (let i = 0; i != split.length; i++) {
+        let trimmedLine = split[i].trim();
+        if (!trimmedLine.startsWith('%%')) {
+            for (let j = 0; j != oldToNewNodeIdMap.length; j++) {
+                let oldNodeId = Object.keys(oldToNewNodeIdMap)[j];
+                if (trimmedLine.indexOf(oldNodeId) != -1) {
+                    trimmedLine = cleanUpNodeIdInDefinition(trimmedLine, oldNodeId, oldToNewNodeIdMap[oldNodeId]);
+                }
+            }
+        }
+        newDefinition += trimmedLine + '\n';
+    }
+    definition = newDefinition.trim(); //Put it on the GUI
+};
+
+const cleanUpNodeIdInDefinition = (line, oldNodeId, newId) => {
+
+};
+
 // To make sure node Ids follow correct naming conventions. Only for graph TD
 const getoldToNewNodeIdMap = () => {
     let layerIndex = 0;
@@ -199,8 +224,7 @@ const getoldToNewNodeIdMap = () => {
 
     return oldToNewNodeIdMap;
 };
-
-//max zz (26*26 layers), layerIndex --> 1 based
+// Max zz (26*26 layers), layerIndex --> 1 based
 const layerIndexToLayer = (layerIndex) => {
     let layer = '';
     let l1Index = Math.floor(layerIndex / 26);
