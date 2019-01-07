@@ -1,7 +1,6 @@
 'use strict';
 //#region fields
 const alphabeth = 'abcdefghijklmnopqrstuvwxyz';
-const edgePathDelimiters = [['(', ')'], ['{', '}'], ['[', ']'], ['>', ']'], ['-'], ['='], ['|']];
 const columnClasses = { full: 'col-12', narrow: 'col-8', veryNarrow: 'col-4', half: 'col-6' };
 const editStates = { graph: 1, help: 2 };
 const maxPercentSvgWidth = 91.3;
@@ -47,7 +46,11 @@ a(( Problem: Out of hamburgers - CLICK ME! )) -- sigh --> b( Step: Get out of ch
 
 b --> c{ Choice: Go to shop }
 c -- yes --> d1[ Hard edge: Eat hamburger ]
-c -- no --> d2[ Stay hungry ]`;
+c -- no --> d2[ Stay hungry ]
+
+%% Notice that the node naming follows a certain pattern. Click one of the last 3 nodes in this example for a visual explanation.
+%% If there are small inconsistencies in your flow, you can fix these by clicking 'fix node ids' right above this text editor. (e.g.  a --> e becomes a --> b)
+%% Please note that this is an EXPERIMENTAL feature. Only the 'Definition' can be fixed ATM, not the 'Help'.`;
 let help = `a:
 # Hi!
 
@@ -151,32 +154,88 @@ or as a range (only layers!), e.g.:
 let htmlHelp = {};
 //#endregion
 
-const cleanupNodeIds = () => {
+const fixNodeIds = () => {
     let newDefinition = '';
-    let oldToNewNodeIdMap = getoldToNewNodeIdMap();
+    let oldToNewNodeIdMap = getOldToNewNodeIdMap();
+    let sortedMapKeys = Object.keys(oldToNewNodeIdMap).sort((a, b) => b.length - a.length); //Sort longes to shortest.
+    if (sortedMapKeys.length === 0) {
+        return;
+    }
 
-    let split = definition.split(/[\n\r]/g);
-    for (let i = 0; i != split.length; i++) {
-        let trimmedLine = split[i].trim();
-        if (!trimmedLine.startsWith('%%')) {
-            for (let j = 0; j != oldToNewNodeIdMap.length; j++) {
-                let oldNodeId = Object.keys(oldToNewNodeIdMap)[j];
-                if (trimmedLine.indexOf(oldNodeId) != -1) {
-                    trimmedLine = cleanUpNodeIdInDefinition(trimmedLine, oldNodeId, oldToNewNodeIdMap[oldNodeId]);
+    if (confirm('Inconsistent node ids found. Are you sure you want to fix this? [Experimental]')) {
+        let split = definition.split(/[\n\r]/g);
+        for (let i = 0; i != split.length; i++) {
+            let trimmedLine = split[i].trim();
+            if (!trimmedLine.startsWith('%%')) {
+                for (let j = 0; j != sortedMapKeys.length; j++) {
+                    let oldNodeId = sortedMapKeys[j];
+                    if (trimmedLine.indexOf(oldNodeId) != -1) {
+                        trimmedLine = fixNodeIdsInDefinition(trimmedLine, oldNodeId, oldToNewNodeIdMap[oldNodeId]);
+                    }
+                }
+            }
+            newDefinition += trimmedLine + '\n';
+        }
+        definition = newDefinition.trim();
+
+        if (editState === editStates.graph) {
+            simplemde.value(definition);
+            simplemde.codemirror.refresh(); // Force refresh.
+        }
+        simplemde.codemirror.on("changes", delayRenderGraph);
+
+        renderGraph();
+
+        simplemde.codemirror.refresh(); // Force refresh.
+    }
+};
+
+const fixNodeIdsInDefinition = (line, oldNodeId, newId) => {
+    let newLine = '';
+
+    let splitLine = [];
+    // Split the path, if any, ignoring all paths and path labels.
+    let regex = /(((===|---|-\.--|==>|-->|-\.->)\|(.*)+\|)|==(.*)>|--(.*)>|-\.(.*)>|==(.*)=|--(.*)-|-\.(.*)--)/g;
+    let found = regex.exec(line);
+
+    if (found) {
+        splitLine.push(found.index === -1 ?
+            line : line.substring(0, found.index), found[0], line.substring(found.index + found[0].length));
+    }
+    else {
+        splitLine.push(line);
+    }
+
+    for (let i = 0; i != splitLine.length; i++) {
+        let part = splitLine[i];
+        if (i === 1) {
+            newLine += part;
+        }
+        else {
+            let oldNodeIdIndex = part.indexOf(oldNodeId);
+            if (oldNodeIdIndex === -1) {
+                newLine += part;
+            }
+            else {
+                regex = /[\({\[]/g; // If the old node id is ecapsulated --> do not replace
+                found = regex.exec(part);
+                if (found) {
+                    newLine += found.index > oldNodeIdIndex ?
+                        part.substring(0, oldNodeIdIndex) + newId + part.substring(oldNodeIdIndex + oldNodeId.length) :
+                        part;
+                }
+                else {
+                    newLine += newId; //part === oldNodeId
                 }
             }
         }
-        newDefinition += trimmedLine + '\n';
     }
-    definition = newDefinition.trim(); //Put it on the GUI
-};
 
-const cleanUpNodeIdInDefinition = (line, oldNodeId, newId) => {
-
+    return newLine;
 };
 
 // To make sure node Ids follow correct naming conventions. Only for graph TD
-const getoldToNewNodeIdMap = () => {
+const getOldToNewNodeIdMap = () => {
     let layerIndex = 0;
     let nodeIndexInLayer = 1;
     let prevLayerY = 0;
@@ -200,7 +259,9 @@ const getoldToNewNodeIdMap = () => {
 
         if (nodeId != newId) {
             oldToNewNodeIdMap[nodeId] = newId;
-            newLayersAndOldIds[newLayer] = [];
+            if (newLayersAndOldIds[newLayer] === undefined) {
+                newLayersAndOldIds[newLayer] = [];
+            }
             newLayersAndOldIds[newLayer].push(nodeId);
         }
 
@@ -208,8 +269,9 @@ const getoldToNewNodeIdMap = () => {
     });
 
     //Omit node indexes in layer if only one node in a layer.
-    for (let i = 0; i != newLayersAndOldIds.length; i++) {
-        let layer = Object.keys(newLayersAndOldIds)[i];
+    let keys = Object.keys(newLayersAndOldIds);
+    for (let i = 0; i != keys.length; i++) {
+        let layer = keys[i];
         let oldIds = newLayersAndOldIds[layer];
         if (oldIds.length === 1) {
             let oldId = oldIds[0];
@@ -222,7 +284,7 @@ const getoldToNewNodeIdMap = () => {
         }
     }
 
-    return oldToNewNodeIdMap;
+    return oldToNewNodeIdMap; //sort longest to shortest.
 };
 // Max zz (26*26 layers), layerIndex --> 1 based
 const layerIndexToLayer = (layerIndex) => {
@@ -714,7 +776,7 @@ const main = () => {
     $('#close-help-btn').click(closeHelpBtnClick);
     $('#definition-btn').change(definitionBtnChange);
     $('#help-btn').change(helpBtnChange);
-    //$('#cleanup-btn').click(cleanupNodeIds);
+    $('#fixNodeIds-btn').click(fixNodeIds);
 
     simplemde = new SimpleMDE({
         element: $("#graph-txt")[0],
@@ -735,8 +797,6 @@ const main = () => {
     //marked.setOptions({    });
 
     renderGraph();
-
-    $('#test-btn').click(cleanupNodeIds);
 }
 
 $(document).ready(main);
