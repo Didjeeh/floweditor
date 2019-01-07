@@ -3,6 +3,7 @@
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
+*   2019-01-07: 0.0.6     - Possible to fix node naming inconsistencies
 *   2019-01-07: pre-0.0.6 - Possible to fix node naming inconsistencies (only in 'Definition' ATM)
 *   2019-01-03: 0.0.5     - Added column layouting option
 *   2018-12-21: 0.0.4     - More performant help and debugged help selectors

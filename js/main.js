@@ -50,7 +50,7 @@ c -- no --> d2[ Stay hungry ]
 
 %% Notice that the node naming follows a certain pattern. Click one of the last 3 nodes in this example for a visual explanation.
 %% If there are small inconsistencies in your flow, you can fix these by clicking 'fix node ids' right above this text editor. (e.g.  a --> e becomes a --> b)
-%% Please note that this is an EXPERIMENTAL feature. Only the 'Definition' can be fixed ATM, not the 'Help'.`;
+%% Please note that this is an EXPERIMENTAL feature. Ranges and lists in help cannot be 'fixed'.`;
 let help = `a:
 # Hi!
 
@@ -156,6 +156,7 @@ let htmlHelp = {};
 
 const fixNodeIds = () => {
     let newDefinition = '';
+    let newHelp = '';
     let oldToNewNodeIdMap = getOldToNewNodeIdMap();
     let sortedMapKeys = Object.keys(oldToNewNodeIdMap).sort((a, b) => b.length - a.length); //Sort longes to shortest.
     if (sortedMapKeys.length === 0) {
@@ -178,10 +179,26 @@ const fixNodeIds = () => {
         }
         definition = newDefinition.trim();
 
-        if (editState === editStates.graph) {
-            simplemde.value(definition);
-            simplemde.codemirror.refresh(); // Force refresh.
+        split = help.split(/[\n\r]/g);
+        for (let i = 0; i != split.length; i++) {
+            let trimmedLine = split[i].trim();
+            for (let j = 0; j != sortedMapKeys.length; j++) {
+                let oldNodeId = sortedMapKeys[j];
+                if (trimmedLine.startsWith(oldNodeId + ':')) {
+                    trimmedLine = oldToNewNodeIdMap[oldNodeId] + ': ' + trimmedLine.substring(oldNodeId.length + 1);
+
+                    if(trimmedLine.length === (oldToNewNodeIdMap[oldNodeId] + ': ').length) {
+                        trimmedLine = trimmedLine.trim();
+                    }
+                }
+            }
+            newHelp += trimmedLine + '\n';
         }
+        help = newHelp.trim();
+
+        simplemde.value(editState === editStates.graph ? definition : help);
+        simplemde.codemirror.refresh(); // Force refresh.
+
         simplemde.codemirror.on("changes", delayRenderGraph);
 
         renderGraph();
