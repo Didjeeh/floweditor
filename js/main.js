@@ -187,7 +187,7 @@ const fixNodeIds = () => {
                 if (trimmedLine.startsWith(oldNodeId + ':')) {
                     trimmedLine = oldToNewNodeIdMap[oldNodeId] + ': ' + trimmedLine.substring(oldNodeId.length + 1);
 
-                    if(trimmedLine.length === (oldToNewNodeIdMap[oldNodeId] + ': ').length) {
+                    if (trimmedLine.length === (oldToNewNodeIdMap[oldNodeId] + ': ').length) {
                         trimmedLine = trimmedLine.trim();
                     }
                 }
@@ -657,6 +657,11 @@ const editBtnClick = () => {
         simplemde.value(definition);
     }
     simplemde.codemirror.refresh(); // Force refresh.
+
+    if (wasEditPaneFirstTimeVisible) {
+        renderGraph();
+    }
+
     $('#graph-div')[0].className = graphDivColumnClass;
     fixGraphDivAndEditorDimensions();
 };
