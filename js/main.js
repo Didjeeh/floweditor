@@ -154,170 +154,6 @@ or as a range (only layers!), e.g.:
 let htmlHelp = {};
 //#endregion
 
-const fixNodeIds = () => {
-    let newDefinition = '';
-    let newHelp = '';
-    let oldToNewNodeIdMap = getOldToNewNodeIdMap();
-    let sortedMapKeys = Object.keys(oldToNewNodeIdMap).sort((a, b) => b.length - a.length); //Sort longes to shortest.
-    if (sortedMapKeys.length === 0) {
-        return;
-    }
-
-    if (confirm('Inconsistent node ids found. Are you sure you want to fix this? [Experimental]')) {
-        let split = definition.split(/[\n\r]/g);
-        for (let i = 0; i != split.length; i++) {
-            let trimmedLine = split[i].trim();
-            if (!trimmedLine.startsWith('%%')) {
-                for (let j = 0; j != sortedMapKeys.length; j++) {
-                    let oldNodeId = sortedMapKeys[j];
-                    if (trimmedLine.indexOf(oldNodeId) != -1) {
-                        trimmedLine = fixNodeIdsInDefinition(trimmedLine, oldNodeId, oldToNewNodeIdMap[oldNodeId]);
-                    }
-                }
-            }
-            newDefinition += trimmedLine + '\n';
-        }
-        definition = newDefinition.trim();
-
-        split = help.split(/[\n\r]/g);
-        for (let i = 0; i != split.length; i++) {
-            let trimmedLine = split[i].trim();
-            for (let j = 0; j != sortedMapKeys.length; j++) {
-                let oldNodeId = sortedMapKeys[j];
-                if (trimmedLine.startsWith(oldNodeId + ':')) {
-                    trimmedLine = oldToNewNodeIdMap[oldNodeId] + ': ' + trimmedLine.substring(oldNodeId.length + 1);
-
-                    if (trimmedLine.length === (oldToNewNodeIdMap[oldNodeId] + ': ').length) {
-                        trimmedLine = trimmedLine.trim();
-                    }
-                }
-            }
-            newHelp += trimmedLine + '\n';
-        }
-        help = newHelp.trim();
-
-        simplemde.value(editState === editStates.graph ? definition : help);
-        simplemde.codemirror.refresh(); // Force refresh.
-
-        simplemde.codemirror.on("changes", delayRenderGraph);
-
-        renderGraph();
-
-        simplemde.codemirror.refresh(); // Force refresh.
-    }
-};
-
-const fixNodeIdsInDefinition = (line, oldNodeId, newId) => {
-    let newLine = '';
-
-    let splitLine = [];
-    // Split the path, if any, ignoring all paths and path labels.
-    let regex = /(((===|---|-\.--|==>|-->|-\.->)\|(.*)+\|)|==(.*)>|--(.*)>|-\.(.*)>|==(.*)=|--(.*)-|-\.(.*)--)/g;
-    let found = regex.exec(line);
-
-    if (found) {
-        splitLine.push(found.index === -1 ?
-            line : line.substring(0, found.index), found[0], line.substring(found.index + found[0].length));
-    }
-    else {
-        splitLine.push(line);
-    }
-
-    for (let i = 0; i != splitLine.length; i++) {
-        let part = splitLine[i];
-        if (i === 1) {
-            newLine += part;
-        }
-        else {
-            let oldNodeIdIndex = part.indexOf(oldNodeId);
-            if (oldNodeIdIndex === -1) {
-                newLine += part;
-            }
-            else {
-                regex = /[\({\[]/g; // If the old node id is ecapsulated --> do not replace
-                found = regex.exec(part);
-                if (found) {
-                    newLine += found.index > oldNodeIdIndex ?
-                        part.substring(0, oldNodeIdIndex) + newId + part.substring(oldNodeIdIndex + oldNodeId.length) :
-                        part;
-                }
-                else {
-                    newLine += newId; //part === oldNodeId
-                }
-            }
-        }
-    }
-
-    return newLine;
-};
-
-// To make sure node Ids follow correct naming conventions. Only for graph TD
-const getOldToNewNodeIdMap = () => {
-    let layerIndex = 0;
-    let nodeIndexInLayer = 1;
-    let prevLayerY = 0;
-    let oldToNewNodeIdMap = {};
-    let newLayersAndOldIds = {}; //For omitting node indexes in layer if only one node in a layer.
-    $('#graph-diagram .nodes .node').each(function (index) {
-        let nodeId = $(this)[0].id;
-        let layerY = $(this).attr('transform').split(",")[1];
-        layerY = layerY.substring(0, layerY.length - 1);
-
-        if (layerY === prevLayerY) {
-            ++nodeIndexInLayer;
-        }
-        else {
-            nodeIndexInLayer = 1;
-            ++layerIndex;
-        }
-
-        let newLayer = layerIndexToLayer(layerIndex);
-        let newId = newLayer + nodeIndexInLayer;
-
-        if (nodeId != newId) {
-            oldToNewNodeIdMap[nodeId] = newId;
-            if (newLayersAndOldIds[newLayer] === undefined) {
-                newLayersAndOldIds[newLayer] = [];
-            }
-            newLayersAndOldIds[newLayer].push(nodeId);
-        }
-
-        prevLayerY = layerY;
-    });
-
-    //Omit node indexes in layer if only one node in a layer.
-    let keys = Object.keys(newLayersAndOldIds);
-    for (let i = 0; i != keys.length; i++) {
-        let layer = keys[i];
-        let oldIds = newLayersAndOldIds[layer];
-        if (oldIds.length === 1) {
-            let oldId = oldIds[0];
-            if (oldId === layer) {
-                delete oldToNewNodeIdMap[oldId];
-            }
-            else {
-                oldToNewNodeIdMap[oldId] = layer;
-            }
-        }
-    }
-
-    return oldToNewNodeIdMap; //sort longest to shortest.
-};
-// Max zz (26*26 layers), layerIndex --> 1 based
-const layerIndexToLayer = (layerIndex) => {
-    let layer = '';
-    let l1Index = Math.floor(layerIndex / 26);
-    let l2Index = (layerIndex % 26);
-
-    if (l1Index != 0) {
-        layer = alphabeth[l1Index - 1];
-    }
-
-    layer += alphabeth[l2Index - 1];
-
-    return layer;
-};
-
 //#region rendering
 const preProcessGraph = (s) => {
     let element = document.createElement('div');
@@ -628,6 +464,170 @@ const bindNodeHover = () => {
         });
         $('[data-toggle="tooltip"]').tooltip();
     }
+};
+//#endregion
+
+//#region fix node ids
+const fixNodeIds = () => {
+    let newDefinition = '';
+    let newHelp = '';
+    let oldToNewNodeIdMap = getOldToNewNodeIdMap();
+    let sortedMapKeys = Object.keys(oldToNewNodeIdMap).sort((a, b) => b.length - a.length); //Sort longes to shortest.
+    if (sortedMapKeys.length === 0) {
+        return;
+    }
+
+    if (confirm('Inconsistent node ids found. Are you sure you want to fix this? [Experimental]')) {
+        let split = definition.split(/[\n\r]/g);
+        for (let i = 0; i != split.length; i++) {
+            let trimmedLine = split[i].trim();
+            if (!trimmedLine.startsWith('%%')) {
+                for (let j = 0; j != sortedMapKeys.length; j++) {
+                    let oldNodeId = sortedMapKeys[j];
+                    if (trimmedLine.indexOf(oldNodeId) != -1) {
+                        trimmedLine = fixNodeIdsInDefinition(trimmedLine, oldNodeId, oldToNewNodeIdMap[oldNodeId]);
+                    }
+                }
+            }
+            newDefinition += trimmedLine + '\n';
+        }
+        definition = newDefinition.trim();
+
+        split = help.split(/[\n\r]/g);
+        for (let i = 0; i != split.length; i++) {
+            let trimmedLine = split[i].trim();
+            for (let j = 0; j != sortedMapKeys.length; j++) {
+                let oldNodeId = sortedMapKeys[j];
+                if (trimmedLine.startsWith(oldNodeId + ':')) {
+                    trimmedLine = oldToNewNodeIdMap[oldNodeId] + ': ' + trimmedLine.substring(oldNodeId.length + 1);
+
+                    if (trimmedLine.length === (oldToNewNodeIdMap[oldNodeId] + ': ').length) {
+                        trimmedLine = trimmedLine.trim();
+                    }
+                }
+            }
+            newHelp += trimmedLine + '\n';
+        }
+        help = newHelp.trim();
+
+        simplemde.value(editState === editStates.graph ? definition : help);
+        simplemde.codemirror.refresh(); // Force refresh.
+
+        simplemde.codemirror.on("changes", delayRenderGraph);
+
+        renderGraph();
+
+        simplemde.codemirror.refresh(); // Force refresh.
+    }
+};
+const fixNodeIdsInDefinition = (line, oldNodeId, newId) => {
+    let newLine = '';
+
+    let splitLine = [];
+    // Split the path, if any, ignoring all paths and path labels.
+    let regex = /(((===|---|-\.--|==>|-->|-\.->)\|(.*)+\|)|==(.*)>|--(.*)>|-\.(.*)>|==(.*)=|--(.*)-|-\.(.*)--)/g;
+    let found = regex.exec(line);
+
+    if (found) {
+        splitLine.push(found.index === -1 ?
+            line : line.substring(0, found.index), found[0], line.substring(found.index + found[0].length));
+    }
+    else {
+        splitLine.push(line);
+    }
+
+    for (let i = 0; i != splitLine.length; i++) {
+        let part = splitLine[i];
+        if (i === 1) {
+            newLine += part;
+        }
+        else {
+            let oldNodeIdIndex = part.indexOf(oldNodeId);
+            if (oldNodeIdIndex === -1) {
+                newLine += part;
+            }
+            else {
+                regex = /[\({\[]/g; // If the old node id is ecapsulated --> do not replace
+                found = regex.exec(part);
+                if (found) {
+                    newLine += found.index > oldNodeIdIndex ?
+                        part.substring(0, oldNodeIdIndex) + newId + part.substring(oldNodeIdIndex + oldNodeId.length) :
+                        part;
+                }
+                else {
+                    newLine += newId; //part === oldNodeId
+                }
+            }
+        }
+    }
+
+    return newLine;
+};
+// To make sure node Ids follow correct naming conventions. Only for graph TD
+const getOldToNewNodeIdMap = () => {
+    let layerIndex = 0;
+    let nodeIndexInLayer = 1;
+    let prevLayerY = 0;
+    let oldToNewNodeIdMap = {};
+    let newLayersAndOldIds = {}; //For omitting node indexes in layer if only one node in a layer.
+    $('#graph-diagram .nodes .node').each(function (index) {
+        let nodeId = $(this)[0].id;
+        let layerY = $(this).attr('transform').split(",")[1];
+        layerY = layerY.substring(0, layerY.length - 1);
+
+        if (layerY === prevLayerY) {
+            ++nodeIndexInLayer;
+        }
+        else {
+            nodeIndexInLayer = 1;
+            ++layerIndex;
+        }
+
+        let newLayer = layerIndexToLayer(layerIndex);
+        let newId = newLayer + nodeIndexInLayer;
+
+        if (nodeId != newId) {
+            oldToNewNodeIdMap[nodeId] = newId;
+            if (newLayersAndOldIds[newLayer] === undefined) {
+                newLayersAndOldIds[newLayer] = [];
+            }
+            newLayersAndOldIds[newLayer].push(nodeId);
+        }
+
+        prevLayerY = layerY;
+    });
+
+    //Omit node indexes in layer if only one node in a layer.
+    let keys = Object.keys(newLayersAndOldIds);
+    for (let i = 0; i != keys.length; i++) {
+        let layer = keys[i];
+        let oldIds = newLayersAndOldIds[layer];
+        if (oldIds.length === 1) {
+            let oldId = oldIds[0];
+            if (oldId === layer) {
+                delete oldToNewNodeIdMap[oldId];
+            }
+            else {
+                oldToNewNodeIdMap[oldId] = layer;
+            }
+        }
+    }
+
+    return oldToNewNodeIdMap; //sort longest to shortest.
+};
+// Max zz (26*26 layers), layerIndex --> 1 based
+const layerIndexToLayer = (layerIndex) => {
+    let layer = '';
+    let l1Index = Math.floor(layerIndex / 26);
+    let l2Index = (layerIndex % 26);
+
+    if (l1Index != 0) {
+        layer = alphabeth[l1Index - 1];
+    }
+
+    layer += alphabeth[l2Index - 1];
+
+    return layer;
 };
 //#endregion
 
