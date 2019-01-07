@@ -778,7 +778,12 @@ const size = (leftColumnClass, rightColumnClass) => {
 
     // Workaround for the toggle button active states to work as they should.
     setTimeout(() => {
-        $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left });
+        try {
+            $('#node-help-div').offset({ top: window.pageYOffset + $('#help-pane').offset().top, left: $('#node-help-div').offset().left });
+        }
+        catch (e) {
+            // Became null
+        }
     }, 10);
 };
 const definitionBtnChange = () => {
