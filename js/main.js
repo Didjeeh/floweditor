@@ -633,6 +633,8 @@ const bindNodeHover = () => {
 
 //#region menu
 const editBtnClick = () => {
+    let prevGraphDivColumnClass = graphDivColumnClass;
+
     if ($('#edit-pane').attr('style').indexOf('display: none') === -1) {
         graphDivColumnClass = columnClasses.full;
 
@@ -658,7 +660,7 @@ const editBtnClick = () => {
     }
     simplemde.codemirror.refresh(); // Force refresh.
 
-    if (wasEditPaneFirstTimeVisible) {
+    if (wasEditPaneFirstTimeVisible && prevGraphDivColumnClass === columnClasses.veryNarrow) {
         renderGraph();
     }
 
@@ -723,6 +725,8 @@ const saveBtnClick = () => {
     $('#controls').prop('disabled', false);
 };
 const closeHelpBtnClick = () => {
+    let prevGraphDivColumnClass = graphDivColumnClass;
+
     $('#close-help-btn').hide();
     $('#edit-btn').show();
     $('#save-btn').show();
@@ -745,6 +749,11 @@ const closeHelpBtnClick = () => {
         currentSelectedNode.removeClass('nodeSelected');
         currentSelectedNodeId = null;
     }
+
+    if (prevGraphDivColumnClass === columnClasses.veryNarrow) {
+        renderGraph();
+    }
+
     $('#graph-div')[0].className = graphDivColumnClass;
     fixGraphDivAndEditorDimensions();
 
