@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Flow editor 0.0.6</title>
+    <title>Flow editor pre-0.0.7</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=gAdOdr5nJd">
@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/mermaid@7.0.10/dist/mermaid.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/table.css">
 </head>
@@ -22,7 +21,7 @@
 <body>
     <div id="menu">
         <span id="title">
-            <h1>Flow editor</h1><strong><a href="https://github.com/Didjeeh/floweditor" target="_blank">0.0.6</a></strong>
+            <h1>Flow editor</h1><strong><a href="https://github.com/Didjeeh/floweditor" target="_blank">pre-0.0.7</a></strong>
         </span>
         <span id="controls">
             <button class="btn btn-primary other-controls" id="edit-btn" type="button" data-toggle="button"
@@ -30,6 +29,7 @@
             <label id="open-file-lbl" class="btn btn-outline-primary" for="open-file">Open</label>
             <input type="file" id="open-file" accept=".sqlite3" style="display: none">
             <button class="btn btn-outline-primary other-controls" id="save-btn" type="button">Save</button>
+            <button class="btn btn-outline-primary other-controls" id="export-btn" type="button">Export</button>
             <button class="btn btn-secundary" id="close-help-btn" type="button" style="display: none">Close help</button>
         </span>
         </span>
@@ -80,9 +80,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script src="https://unpkg.com/mermaid@7.0.10/dist/mermaid.min.js"></script>
-    <script src="js/sql.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.0/dist/FileSaver.min.js" integrity="sha256-5Fv+LQlkb6dD3pAHzJb7FLI1iSqJE9GCza+HQtcI06k="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js" integrity="sha256-/TJ3oz21GcbAumzyribL4NFZPfmPdDHphyJMQAEDSxo="
+        crossorigin="anonymous"></script>
+    <script src="js/sql.js"></script>
     <script src="js/main.js"></script>
 </body>
 

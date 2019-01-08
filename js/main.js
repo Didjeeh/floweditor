@@ -62,15 +62,15 @@ What you see here is a very simplistic example, just to explain you how this wor
 
 When you are ready you can *close this help* by clicking the button in the upper-right corner: 
 
-![](https://imgur.com/8uza0v1.png)
+![](https://i.imgur.com/8uza0v1.png)
 
 And you can *edit* and *save* this flow or *open another*.
 
-![](https://imgur.com/uIfLhzf.png)
+![](https://i.imgur.com/uIfLhzf.png)
 
 When you click the *Edit* button you will see following 2 buttons and an edit field.
 
-![](https://imgur.com/45boDAL.png)
+![](https://i.imgur.com/45boDAL.png)
 
 ## Definition
 The definition defines the flow in a textual manner. This allows constructing flows fast.
@@ -141,7 +141,7 @@ When there is **no** help available for specific elements in a layer (*d1(m)* an
 
 To make naming nodes easy you can use the following manner:
 
-![](https://imgur.com/JkATePW.png)
+![](https://i.imgur.com/JkATePW.png)
 
 Furthermore, you can link help to multiple nodes. You can notate as a list, e.g.:
 
@@ -151,7 +151,16 @@ or as a range (only layers!), e.g.:
 
 \`y..ac:\``;
 
-let htmlHelp = {};
+let htmlHelpSelectors = {};
+let htmlHelpContent = [];
+
+// A hack for the svg to base64 to work. Inline styling is available in mermaid 8.
+// But it's release candidate does not work as well as mermaid 7. 
+const svgInlineStyle = '#graph-diagram .label { font-family: "trebuchet ms", verdana, arial; color: #333; }#graph-diagram .node rect,#graph-diagram .node circle,#graph-diagram .node ellipse,#graph-diagram .node polygon { fill: #ECECFF; stroke: #9370DB; stroke-width: 1px; }#graph-diagram .node.clickable { cursor: pointer; }#graph-diagram .arrowheadPath { fill: #333333; }#graph-diagram .edgePath .path { stroke: #333333; stroke-width: 1.5px; }#graph-diagram .edgeLabel { background-color: #e8e8e8; }#graph-diagram .cluster rect { fill: #ffffde !important; stroke: #aaaa33 !important; stroke-width: 1px !important; }#graph-diagram .cluster text { fill: #333; }#graph-diagram div.mermaidTooltip { position: absolute; text-align: center; max-width: 200px; padding: 2px; font-family: "trebuchet ms", verdana, arial; font-size: 12px; background: #ffffde; border: 1px solid #aaaa33; border-radius: 2px; pointer-events: none; z-index: 100; }#graph-diagram .actor { stroke: #CCCCFF; fill: #ECECFF; }#graph-diagram text.actor { fill: black; stroke: none; }#graph-diagram .actor-line { stroke: grey; }#graph-diagram .messageLine0 { stroke-width: 1.5; stroke-dasharray: "2 2"; stroke: #333; }#graph-diagram .messageLine1 { stroke-width: 1.5; stroke-dasharray: "2 2"; stroke: #333; }#graph-diagram #arrowhead { fill: #333; }#graph-diagram #crosshead path { fill: #333 !important; stroke: #333 !important; }#graph-diagram .messageText { fill: #333; stroke: none; }#graph-diagram .labelBox { stroke: #CCCCFF; fill: #ECECFF; }#graph-diagram .labelText { fill: black; stroke: none; }#graph-diagram .loopText { fill: black; stroke: none; }#graph-diagram .loopLine { stroke-width: 2; stroke-dasharray: "2 2"; stroke: #CCCCFF; }#graph-diagram .note { stroke: #aaaa33; fill: #fff5ad; }#graph-diagram .noteText { fill: black; stroke: none; font-family: "trebuchet ms", verdana, arial; font-size: 14px; }#graph-diagram .activation0 { fill: #f4f4f4; stroke: #666; }#graph-diagram .activation1 { fill: #f4f4f4; stroke: #666; }#graph-diagram .activation2 { fill: #f4f4f4; stroke: #666; }#graph-diagram .section { stroke: none; opacity: 0.2; }#graph-diagram .section0 { fill: rgba(102, 102, 255, 0.49); }#graph-diagram .section2 { fill: #fff400; }#graph-diagram .section1,#graph-diagram .section3 { fill: white; opacity: 0.2; }#graph-diagram .sectionTitle0 { fill: #333; }#graph-diagram .sectionTitle1 { fill: #333; }#graph-diagram .sectionTitle2 { fill: #333; }#graph-diagram .sectionTitle3 { fill: #333; }#graph-diagram .sectionTitle { text-anchor: start; font-size: 11px; text-height: 14px; }#graph-diagram .grid .tick { stroke: lightgrey; opacity: 0.3; shape-rendering: crispEdges; }#graph-diagram .grid path { stroke-width: 0; }#graph-diagram .today { fill: none; stroke: red; stroke-width: 2px; }#graph-diagram .task { stroke-width: 2; }#graph-diagram .taskText { text-anchor: middle; font-size: 11px; }#graph-diagram .taskTextOutsideRight { fill: black; text-anchor: start; font-size: 11px; }#graph-diagram .taskTextOutsideLeft { fill: black; text-anchor: end; font-size: 11px; }#graph-diagram .taskText0,#graph-diagram .taskText1,#graph-diagram .taskText2,#graph-diagram .taskText3 { fill: white; }#graph-diagram .task0,#graph-diagram .task1,#graph-diagram .task2,#graph-diagram .task3 { fill: #8a90dd; stroke: #534fbc; }#graph-diagram .taskTextOutside0,#graph-diagram .taskTextOutside2 { fill: black; }#graph-diagram .taskTextOutside1,#graph-diagram .taskTextOutside3 { fill: black; }#graph-diagram .active0,#graph-diagram .active1,#graph-diagram .active2,#graph-diagram .active3 { fill: #bfc7ff; stroke: #534fbc; }#graph-diagram .activeText0,#graph-diagram .activeText1,#graph-diagram .activeText2,#graph-diagram .activeText3 { fill: black !important; }#graph-diagram .done0,#graph-diagram .done1,#graph-diagram .done2,#graph-diagram .done3 { stroke: grey; fill: lightgrey; stroke-width: 2; }#graph-diagram .doneText0,#graph-diagram .doneText1,#graph-diagram .doneText2,#graph-diagram .doneText3 { fill: black !important; }#graph-diagram .crit0,#graph-diagram .crit1,#graph-diagram .crit2,#graph-diagram .crit3 { stroke: #ff8888; fill: red; stroke-width: 2; }#graph-diagram .activeCrit0,#graph-diagram .activeCrit1,#graph-diagram .activeCrit2,#graph-diagram .activeCrit3 { stroke: #ff8888; fill: #bfc7ff; stroke-width: 2; }#graph-diagram .doneCrit0,#graph-diagram .doneCrit1,#graph-diagram .doneCrit2,#graph-diagram .doneCrit3 { stroke: #ff8888; fill: lightgrey; stroke-width: 2; cursor: pointer; shape-rendering: crispEdges; }#graph-diagram .doneCritText0,#graph-diagram .doneCritText1,#graph-diagram .doneCritText2,#graph-diagram .doneCritText3 { fill: black !important; }#graph-diagram .activeCritText0,#graph-diagram .activeCritText1,#graph-diagram .activeCritText2,#graph-diagram .activeCritText3 { fill: black !important; }#graph-diagram .titleText { text-anchor: middle; font-size: 18px; fill: black; }#graph-diagram g.classGroup text { fill: #9370DB; stroke: none; font-family: "trebuchet ms", verdana, arial; font-size: 10px; }#graph-diagram g.classGroup rect { fill: #ECECFF; stroke: #9370DB; }#graph-diagram g.classGroup line { stroke: #9370DB; stroke-width: 1; }#graph-diagram .classLabel .box { stroke: none; stroke-width: 0; fill: #ECECFF; opacity: 0.5; }#graph-diagram .classLabel .label { fill: #9370DB; font-size: 10px; }#graph-diagram .relation { stroke: #9370DB; stroke-width: 1; fill: none; }#graph-diagram #compositionStart { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram #compositionEnd { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram #aggregationStart { fill: #ECECFF; stroke: #9370DB; stroke-width: 1; }#graph-diagram #aggregationEnd { fill: #ECECFF; stroke: #9370DB; stroke-width: 1; }#graph-diagram #dependencyStart { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram #dependencyEnd { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram #extensionStart { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram #extensionEnd { fill: #9370DB; stroke: #9370DB; stroke-width: 1; }#graph-diagram .commit-id,#graph-diagram .commit-msg,#graph-diagram .branch-label { fill: lightgrey; color: lightgrey; } #graph-diagram { color: rgba(0, 0, 0, 0.65); font: ; }';
+
+// Very messy, but necessary for the docx export.
+const mainInlineStyle = '#graph-div {text-align: center;}.node-help-head { font-weight: bold; color: #9370DB; }.nodes .node {color: black;}.edgeLabel {color: black;}';
+const tableInlineStyle = 'table { border-collapse: collapse; border-spacing: 0; empty-cells: show; border: 1px solid #cbcbcb; margin: 1rem 0; } table caption { color: #000; font: italic 85%/1 arial, sans-serif; padding: 1em 0; text-align: center; } table td, table th { border-left: 1px solid #cbcbcb; border-width: 0 0 0 1px; font-size: inherit; margin: 0; overflow: visible; padding: 0.5em 1em; } table td:first-child, table th:first-child { border-left-width: 0; } table thead { background-color: #e0e0e0; color: #000; text-align: left; vertical-align: bottom; } table tr:nth-child(2n-1) td { background-color: #f2f2f2; }';
 //#endregion
 
 //#region rendering
@@ -220,6 +229,7 @@ const renderGraph = () => {
                     fillHtmlHelp();
                     bindNodeClick();
                     bindNodeHover();
+                    inlineCSS();
                 });
             }
         }
@@ -260,7 +270,8 @@ const fixGraphDivAndEditorDimensions = () => {
     }
 };
 const fillHtmlHelp = () => {
-    htmlHelp = {};
+    htmlHelpSelectors = {};
+    htmlHelpContent = [];
     let split = help.split(/[\n\r]/g);
     let lastNodeIds = [];
     for (let i = 0; i != split.length; i++) {
@@ -287,26 +298,41 @@ const fillHtmlHelp = () => {
                 }
 
                 let nodeId = lastNodeIds[0];
-                if (htmlHelp[nodeId]) { // Add as text to existing
-                    value = htmlHelp[nodeId] + key + ':' + value;
+                let keys = Object.keys(htmlHelpSelectors);
+                let nodeIdIndex = keys.indexOf(nodeId);
+                if (nodeIdIndex === -1) {
+                    htmlHelpContent.push(value);
+                    nodeIdIndex = htmlHelpContent.length - 1;
+                }
+                else { // Add as text to existing
+                    htmlHelpContent[nodeIdIndex] += key + ':' + value;
                 }
 
                 for (let i = 0; i != lastNodeIds.length; i++) {
-                    htmlHelp[lastNodeIds[i]] = value;
+                    htmlHelpSelectors[lastNodeIds[i]] = nodeIdIndex;
                 }
             }
         }
         else {
-            let value;
             if (lastNodeIds) {
-                value = htmlHelp[lastNodeIds[0]];
+                let nodeId = lastNodeIds[0];
+                let keys = Object.keys(htmlHelpSelectors);
+                let nodeIdIndex = keys.indexOf(nodeId);
                 if (!kvpCandidate) {
                     kvpCandidate = '\n';
                 }
-                value += '\n' + kvpCandidate;
-            }
-            for (let i = 0; i != lastNodeIds.length; i++) {
-                htmlHelp[lastNodeIds[i]] = value;
+
+                if (nodeIdIndex === -1) {
+                    htmlHelpContent.push(kvpCandidate);
+                    nodeIdIndex = htmlHelpContent.length - 1;
+                }
+                else { // Add as text to existing
+                    htmlHelpContent[nodeIdIndex] += '\n' + kvpCandidate;
+                }
+
+                for (let i = 0; i != lastNodeIds.length; i++) {
+                    htmlHelpSelectors[lastNodeIds[i]] = nodeIdIndex;
+                }
             }
         }
     }
@@ -415,10 +441,10 @@ const bindNodeClick = () => {
         windowScrollY = window.pageYOffset;
 
         let nodeId = $(this).attr('id');
-        let nodeHelp = htmlHelp[nodeId.toLowerCase()];;
+        let nodeHelp = htmlHelpContent[htmlHelpSelectors[nodeId.toLowerCase()]];
 
         //To make selecting easier
-        nodeHelp = '<div id=\'node-help-div\'><label id=\'node-help-head\'>' + $(this).text() + '</label>' +
+        nodeHelp = '<div id=\'node-help-div\'><label class=\'node-help-head\'>' + $(this).text() + '</label>' +
             (nodeHelp === undefined ? '' : converter.makeHtml(nodeHelp)) +
             '</div>';
 
@@ -440,6 +466,7 @@ const bindNodeClick = () => {
         $('#help-pane')[0].className = otherColumnClassSized;
 
         $('#save-btn').hide();
+        $('#export-btn').hide();
         $('#open-file-lbl').hide();
         $('#edit-btn').hide();
         $('#edit-pane').hide();
@@ -465,10 +492,17 @@ const bindNodeHover = () => {
         $('[data-toggle="tooltip"]').tooltip();
     }
 };
+const inlineCSS = () => {
+    let svg = $('#graph-div')[0].children[0];
+    svg.children[0].innerHTML = svgInlineStyle;
+};
 //#endregion
 
 //#region fix node ids
 const fixNodeIds = () => {
+    if (errorText.length != 0) {
+        return;
+    }
     let newDefinition = '';
     let newHelp = '';
     let oldToNewNodeIdMap = getOldToNewNodeIdMap();
@@ -724,12 +758,113 @@ const saveBtnClick = () => {
     $('#save-btn').text('Save');
     $('#controls').prop('disabled', false);
 };
+const exportBtnClick = () => {
+    if (errorText.length != 0) {
+        return;
+    }
+
+    $('#export-btn').text('Exporting...');
+    $('#controls').prop('disabled', true);
+
+    let divToExport = $('<div></div>');
+
+    let canvas = document.createElement("canvas");
+    let context = canvas.getContext("2d");
+
+    appendGraph(divToExport, canvas, context).then(
+        div => {
+            divToExport = div;
+            divToExport.append('<br>');
+
+            let prevNodeHelpIndex = -1;
+            let nodeHelpLabels = [];
+            let nodeHelp;
+            let keys = Object.keys(htmlHelpSelectors);
+            for (let i = 0; i != keys.length; i++) {
+                let nodeId = keys[i];
+                let nodeHelpIndex = htmlHelpSelectors[nodeId];
+
+                if (prevNodeHelpIndex != nodeHelpIndex) {
+                    if (prevNodeHelpIndex != -1) {
+                        divToExport.append('<div class=\'node-help-head\'>' + nodeHelpLabels.join(' | ') + '</div>');
+                        divToExport.append(nodeHelp);
+
+                        nodeHelpLabels = null;
+                        nodeHelp = null;
+                    }
+
+                    nodeHelpLabels = [];
+                    nodeHelp = converter.makeHtml(htmlHelpContent[nodeHelpIndex]) + '<br>';
+
+                    prevNodeHelpIndex = nodeHelpIndex;
+                }
+
+                nodeHelpLabels.push($('#' + nodeId).text());
+            }
+
+            if (nodeHelp) {
+                divToExport.append('<div class=\'node-help-head\'>' + nodeHelpLabels.join(' | ') + '</div>');
+                divToExport.append(nodeHelp);
+            }
+
+            let toExport = '<!DOCTYPE html><html><head><title>Flow</title><style>' +
+                mainInlineStyle + ' ' + tableInlineStyle + '</style></head><body>' +
+                divToExport[0].innerHTML + '</body></html>';
+
+            let blob = htmlDocx.asBlob(toExport);
+            saveAs(blob, 'flow.docx');
+
+            exportFinished();
+        },
+        err => exportFinished(err)
+    );
+};
+const exportFinished = (err) => {
+    $('#export-btn').text('Export');
+    $('#controls').prop('disabled', false);
+
+    if (err) {
+        console.error(err);
+        alert('Export to docx failed.');
+    }
+}
+const appendGraph = (div, canvas, context) => {
+    return new Promise((resolve, reject) => {
+        let imgStub = new Image;
+        imgStub.crossOrigin = 'Anonymous';
+
+        imgStub.addEventListener('load', () => {
+            canvas.width = imgStub.width;
+            canvas.height = imgStub.height;
+
+            context.drawImage(imgStub, 0, 0);
+
+            try {
+                let img = new Image
+                img.src = canvas.toDataURL("image/png");
+
+                let graphDiv = $('<div id="graph-div"></div>')
+                graphDiv.append(img);
+                div.append(graphDiv);
+                resolve(div);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
+        let svg = $('#graph-div')[0].children[0];
+        imgStub.width = svg.clientWidth;
+        imgStub.height = svg.clientHeight;
+        imgStub.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
+    });
+};
 const closeHelpBtnClick = () => {
     let prevGraphDivColumnClass = graphDivColumnClass;
 
     $('#close-help-btn').hide();
     $('#edit-btn').show();
     $('#save-btn').show();
+    $('#export-btn').show();
     $('#open-file-lbl').show();
     $('#help-pane').hide();
 
@@ -801,9 +936,10 @@ const helpBtnChange = () => {
 //#endregion
 
 const main = () => {
+    $('#edit-btn').click(editBtnClick);
     $('#open-file').change(openFileChange);
     $('#save-btn').click(saveBtnClick);
-    $('#edit-btn').click(editBtnClick);
+    $('#export-btn').click(exportBtnClick);
 
     $('#small-column-left').change(() => { size(columnClasses.veryNarrow, columnClasses.narrow) });
     $('#equal-sized-columns').change(() => { size(columnClasses.half, columnClasses.half) });
