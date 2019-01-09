@@ -207,6 +207,9 @@ const renderGraph = () => {
         }
 
         if (mermaid.parse(graphDefinition)) {
+            $('#export-btn').prop('disabled', false);
+            $('#fixNodeIds-btn').prop('disabled', false);
+
             try {
                 $('#graph-div').remove();
             } catch (e) { }
@@ -234,6 +237,9 @@ const renderGraph = () => {
             }
         }
         else {
+            $('#export-btn').prop('disabled', true);
+            $('#fixNodeIds-btn').prop('disabled', true);
+
             if (errorText && editState === editStates.graph) {
                 $('#graph-parse-error').show();
             }
@@ -559,7 +565,7 @@ const fixNodeIdsInDefinition = (line, oldNodeId, newId) => {
 
     let splitLine = [];
     // Split the path, if any, ignoring all paths and path labels.
-    let regex = /(((===|---|-\.--|==>|-->|-\.->)\|(.*)+\|)|==(.*)>|--(.*)>|-\.(.*)>|==(.*)=|--(.*)-|-\.(.*)--)/g;
+    let regex = /(((===|---|-\.--|==>|-->|-\.->)\|(.*?)+\|)|==(.*?)>|--(.*?)>|-\.(.*?)>|==(.*?)=|--(.*?)-|-\.(.*?)--)/g;
     let found = regex.exec(line);
 
     if (found) {
