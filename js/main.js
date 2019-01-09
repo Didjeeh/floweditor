@@ -511,8 +511,9 @@ const fixNodeIds = () => {
     }
     let newDefinition = '';
     let newHelp = '';
-    let oldToNewNodeIdMap = getOldToNewNodeIdMap();
-    let sortedMapKeys = Object.keys(oldToNewNodeIdMap).sort((a, b) => b.length - a.length); //Sort longes to shortest.
+    let oldToNewNodeIdMap = sortOldToNewNodeIdMap(getOldToNewNodeIdMap());
+
+    let sortedMapKeys = Object.keys(oldToNewNodeIdMap);
     if (sortedMapKeys.length === 0) {
         return;
     }
@@ -653,7 +654,7 @@ const getOldToNewNodeIdMap = () => {
         }
     }
 
-    return oldToNewNodeIdMap; //sort longest to shortest.
+    return oldToNewNodeIdMap;
 };
 // Max zz (26*26 layers), layerIndex --> 1 based
 const layerIndexToLayer = (layerIndex) => {
@@ -669,6 +670,37 @@ const layerIndexToLayer = (layerIndex) => {
 
     return layer;
 };
+const sortOldToNewNodeIdMap = (oldToNewNodeIdMap) => {
+    let map = {};
+    let layers = [];
+    let layersAndNodes = {};
+    let keys = Object.keys(oldToNewNodeIdMap);
+    for (let i = 0; i != keys.length; i++) {
+        let nodeId = keys[i];
+        let layer = findNodeLayer(nodeId);
+        if (layers.indexOf(layer === -1)) {
+            layers.push(layer);
+        }
+        if (layersAndNodes[layer] === undefined) {
+            layersAndNodes[layer] = [];
+        }
+        layersAndNodes[layer].push(nodeId)
+    }
+    layers.sort((a, b) => b.length - a.length); //Sort longes to shortest.
+
+    for (let i = 0; i != layers.length; i++) {
+        let layer = layers[i];
+        let nodes = layersAndNodes[layer];
+        nodes.sort((a, b) => b.length - a.length);
+
+        for (let j = 0; j != nodes.length; j++) {
+            let node = nodes[j];
+            map[node] = oldToNewNodeIdMap[node];
+        }
+    }
+
+    return map;
+}
 //#endregion
 
 //#region menu
