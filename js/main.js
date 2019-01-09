@@ -234,7 +234,7 @@ const renderGraph = () => {
                     bindNodeHover();
 
                     //inline css
-                    graph[0].children[0].children[0].innerHTML = svgInlineStyle;
+                    graph.children[0].children[0].innerHTML = svgInlineStyle;
                 });
             }
         }
@@ -646,7 +646,7 @@ const getOldToNewNodeIdMap = () => {
             if (oldId === layer) {
                 delete oldToNewNodeIdMap[oldId];
             }
-            else {
+            else if(oldToNewNodeIdMap[oldId] === layer + '1') {
                 oldToNewNodeIdMap[oldId] = layer;
             }
         }
