@@ -232,7 +232,9 @@ const renderGraph = () => {
                     fillHtmlHelp();
                     bindNodeClick();
                     bindNodeHover();
-                    inlineCSS();
+
+                    //inline css
+                    graph[0].children[0].children[0].innerHTML = svgInlineStyle;
                 });
             }
         }
@@ -497,10 +499,6 @@ const bindNodeHover = () => {
         });
         $('[data-toggle="tooltip"]').tooltip();
     }
-};
-const inlineCSS = () => {
-    let svg = $('#graph-div')[0].children[0];
-    svg.children[0].innerHTML = svgInlineStyle;
 };
 //#endregion
 
