@@ -335,7 +335,8 @@ const fillHtmlHelp = () => {
                     nodeIdIndex = htmlHelpContent.length - 1;
                 }
                 else { // Add as text to existing
-                    htmlHelpContent[nodeIdIndex] += '\n' + kvpCandidate;
+                    htmlHelpContent[nodeIdIndex] = (htmlHelpContent[nodeIdIndex] === undefined) ?
+                     kvpCandidate : htmlHelpContent[nodeIdIndex] + '\n' + kvpCandidate;
                 }
 
                 for (let i = 0; i != lastNodeIds.length; i++) {
@@ -360,13 +361,17 @@ const findNodeIdsForHelp = (helpKey) => {
             return;
         }
 
-        if (helpKey.indexOf(',' + nodeId) > 0 || helpKey.indexOf(nodeId + ',') > -1) {
+        if (helpKey.endsWith(',' + nodeId) ||
+            helpKey.startsWith(nodeId + ',') ||
+            helpKey.indexOf(',' + nodeId + ',') > 0) {
             nodeIds.push(nodeId);
             return;
         }
 
         let nodeLayer = findNodeLayer(nodeId);
-        if (helpKey.indexOf(',' + nodeLayer) > 0 || helpKey.indexOf(nodeLayer + ',') > -1) {
+        if (helpKey.endsWith(',' + nodeLayer) ||
+            helpKey.startsWith(nodeLayer + ',') ||
+            helpKey.indexOf(',' + nodeLayer + ',') > 0) {
             nodeIds.push(nodeId);
             return;
         }
@@ -646,7 +651,7 @@ const getOldToNewNodeIdMap = () => {
             if (oldId === layer) {
                 delete oldToNewNodeIdMap[oldId];
             }
-            else if(oldToNewNodeIdMap[oldId] === layer + '1') {
+            else if (oldToNewNodeIdMap[oldId] === layer + '1') {
                 oldToNewNodeIdMap[oldId] = layer;
             }
         }
@@ -923,6 +928,9 @@ const closeHelpBtnClick = () => {
 
     if (prevGraphDivColumnClass === columnClasses.veryNarrow) {
         renderGraph();
+    }
+    else if(isEditPaneVisible) {
+        bindNodeHover();
     }
 
     $('#graph-div')[0].className = graphDivColumnClass;
