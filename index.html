@@ -29,7 +29,17 @@
             <label id="open-file-lbl" class="btn btn-outline-primary" for="open-file">Open</label>
             <input type="file" id="open-file" accept=".sqlite3" style="display: none">
             <button class="btn btn-outline-primary other-controls" id="save-btn" type="button">Save</button>
-            <button class="btn btn-outline-primary other-controls" id="export-btn" type="button">Export</button>
+            <span class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle other-controls" id="export-btn" type="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Export
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <button class="dropdown-item" id="export-docx-btn" type="button">Word</button>
+                    <button class="dropdown-item" id="export-png-btn" type="button">Image (PNG)</button>
+                    <button class="dropdown-item" id="export-svg-btn" type="button">Image (SVG)</button>
+                </div>
+            </span>
             <button class="btn btn-secundary" id="close-help-btn" type="button" style="display: none">Close help</button>
         </span>
         </span>

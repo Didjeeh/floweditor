@@ -164,6 +164,9 @@ const mainInlineStyle = '#graph-div {text-align: center;}.node-help-head { font-
 const tableInlineStyle = 'table { border-collapse: collapse; border-spacing: 0; empty-cells: show; border: 1px solid #cbcbcb; margin: 1rem 0; } table caption { color: #000; font: italic 85%/1 arial, sans-serif; padding: 1em 0; text-align: center; } table td, table th { border-left: 1px solid #cbcbcb; border-width: 0 0 0 1px; font-size: inherit; margin: 0; overflow: visible; padding: 0.5em 1em; } table td:first-child, table th:first-child { border-left-width: 0; } table thead { background-color: #e0e0e0; color: #000; text-align: left; vertical-align: bottom; } table tr:nth-child(2n-1) td { background-color: #f2f2f2; }';
 const extraMsWordInlineStyle = 'tr { page-break-after:avoid; }';
 const msWordPageBreak = '<br clear=all style="mso-special-character:line-break;page-break-before:always">';
+
+let canvas;
+let context;
 //#endregion
 
 //#region rendering
@@ -802,7 +805,7 @@ const saveBtnClick = () => {
     $('#save-btn').text('Save');
     $('#controls').prop('disabled', false);
 };
-const exportBtnClick = () => {
+const exportDocxBtnClick = () => {
     if (errorText.length != 0) {
         return;
     }
@@ -812,12 +815,11 @@ const exportBtnClick = () => {
 
     let divToExport = $('<div></div>');
 
-    let canvas = document.createElement("canvas");
-    let context = canvas.getContext("2d");
-
-    appendGraph(divToExport, canvas, context).then(
-        div => {
-            divToExport = div;
+    createGraphPng().then(
+        img => {
+            let graphDiv = $('<div id="graph-div"></div>')
+            graphDiv.append(img);
+            divToExport.append(graphDiv);
 
             let prevNodeHelpIndex = -1;
             let nodeHelpLabels = [];
@@ -871,7 +873,8 @@ const exportFinished = (err) => {
         alert('Export to docx failed.');
     }
 }
-const appendGraph = (div, canvas, context) => {
+//Returns an img element sized to fit on a page (Word).
+const createGraphPng = () => {
     return new Promise((resolve, reject) => {
         let imgStub = new Image;
         imgStub.crossOrigin = 'Anonymous';
@@ -885,21 +888,71 @@ const appendGraph = (div, canvas, context) => {
             try {
                 let img = new Image
                 img.src = canvas.toDataURL("image/png");
-
-                let graphDiv = $('<div id="graph-div"></div>')
-                graphDiv.append(img);
-                div.append(graphDiv);
-                resolve(div);
+                resolve(img);
             }
             catch (err) {
                 reject(err);
             }
         });
         let svg = $('#graph-div')[0].children[0];
-        imgStub.width = svg.clientWidth;
-        imgStub.height = svg.clientHeight;
+        let optimalHeight = 900;
+        imgStub.width = (svg.clientWidth / svg.clientHeight) * optimalHeight;
+        imgStub.height = optimalHeight;
         imgStub.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
     });
+};
+const exportPngBtnClick = () => {
+    if (errorText.length != 0) {
+        return;
+    }
+
+    $('#export-btn').text('Exporting...');
+    $('#controls').prop('disabled', true);
+
+    let imgStub = new Image;
+    imgStub.crossOrigin = 'Anonymous';
+
+    imgStub.addEventListener('load', () => {
+        try {
+            canvas.width = imgStub.width;
+            canvas.height = imgStub.height;
+
+            context.drawImage(imgStub, 0, 0);
+
+            canvas.toBlob((blob) => {
+                saveAs(blob, "flow.png");
+            });
+
+            exportFinished();
+        }
+        catch (err) {
+            exportFinished(err)
+        }
+    });
+    let svg = $('#graph-div')[0].children[0];
+    imgStub.width = svg.clientWidth;
+    imgStub.height = svg.clientHeight;
+    imgStub.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
+};
+const exportSvgBtnClick = () => {
+    if (errorText.length != 0) {
+        return;
+    }
+
+    $('#export-btn').text('Exporting...');
+    $('#controls').prop('disabled', true);
+
+    try {
+        let svg = $('#graph-div')[0].children[0];
+
+        let blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+        saveAs(blob, 'flow.svg');
+
+        exportFinished();
+    }
+    catch (err) {
+        exportFinished(err)
+    }
 };
 const closeHelpBtnClick = () => {
     let prevGraphDivColumnClass = graphDivColumnClass;
@@ -985,7 +1038,9 @@ const main = () => {
     $('#edit-btn').click(editBtnClick);
     $('#open-file').change(openFileChange);
     $('#save-btn').click(saveBtnClick);
-    $('#export-btn').click(exportBtnClick);
+    $('#export-docx-btn').click(exportDocxBtnClick);
+    $('#export-png-btn').click(exportPngBtnClick);
+    $('#export-svg-btn').click(exportSvgBtnClick);
 
     $('#small-column-left').change(() => { size(columnClasses.veryNarrow, columnClasses.narrow) });
     $('#equal-sized-columns').change(() => { size(columnClasses.half, columnClasses.half) });
@@ -1013,6 +1068,9 @@ const main = () => {
     simplemde.codemirror.on("changes", delayRenderGraph);
 
     //marked.setOptions({    });
+
+    canvas = document.createElement("canvas");
+    context = canvas.getContext("2d");
 
     renderGraph();
 }
