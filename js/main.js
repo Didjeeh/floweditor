@@ -865,12 +865,21 @@ const exportDocxBtnClick = () => {
     );
 };
 const exportFinished = (err) => {
+    try {
+        let svg = $('#graph-div')[0].children[0];
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+    }
+    catch{
+
+    }
+
     $('#export-btn').text('Export');
     $('#controls').prop('disabled', false);
 
     if (err) {
         console.error(err);
-        alert('Export to docx failed.');
+        alert('Export failed.');
     }
 }
 //Returns an img element sized to fit on a page (Word).
@@ -896,8 +905,18 @@ const createGraphPng = () => {
         });
         let svg = $('#graph-div')[0].children[0];
         let optimalHeight = 900;
-        imgStub.width = (svg.clientWidth / svg.clientHeight) * optimalHeight;
+
+        let rect = svg.getBoundingClientRect();
+        let width = svg.clientWidth || Math.round(rect.width);
+        let height= svg.clientHeight || Math.round(rect.height);
+
+        imgStub.width = (width / height) * optimalHeight;
         imgStub.height = optimalHeight;
+
+        //Needed for Firefox  https://bugzilla.mozilla.org/show_bug.cgi?id=700533
+        svg.setAttribute('width', imgStub.width);;
+        svg.setAttribute('height', imgStub.height);
+
         imgStub.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
     });
 };
@@ -930,8 +949,15 @@ const exportPngBtnClick = () => {
         }
     });
     let svg = $('#graph-div')[0].children[0];
-    imgStub.width = svg.clientWidth;
-    imgStub.height = svg.clientHeight;
+
+    let rect = svg.getBoundingClientRect();
+    imgStub.width = svg.clientWidth || Math.round(rect.width);
+    imgStub.height = svg.clientHeight || Math.round(rect.height);
+
+    //Needed for Firefox  https://bugzilla.mozilla.org/show_bug.cgi?id=700533
+    svg.setAttribute('width', imgStub.width);;
+    svg.setAttribute('height', imgStub.height);
+
     imgStub.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
 };
 const exportSvgBtnClick = () => {
