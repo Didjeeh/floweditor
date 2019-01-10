@@ -852,7 +852,7 @@ const exportDocxBtnClick = () => {
                 divToExport.append(nodeHelp);
             }
 
-            let toExport = '<!DOCTYPE html><html><head><title>Flow</title><style>' +
+            let toExport = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"><title>Flow</title><style>' +
                 bootstrapInlineStyle + '' + mainInlineStyle + ' ' + tableInlineStyle + ' ' + extraMsWordInlineStyle +
                 '</style></head><body>' + divToExport[0].innerHTML + '</body></html>';
 
