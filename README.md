@@ -3,6 +3,7 @@
 **Live demo [HERE](https://didjeeh.github.io/floweditor)**
 
 # Versions
+*   2019-01-10: 0.0.7     - Export to docx, png and svg
 *   2019-01-08: pre-0.0.7 - Export to docx (not yet perfect)   
 *   2019-01-07: 0.0.6     - Possible to fix node naming inconsistencies
 *   2019-01-07: pre-0.0.6 - Possible to fix node naming inconsistencies (only in 'Definition' ATM)
@@ -39,5 +40,5 @@ Sufficient help is provided in the app itself.
 *   Markdown parser:        <https://marked.js.org> and <http://showdownjs.com>
 *   SQL helper:             <https://github.com/kripken/sql.js>
 *   Saving files:           <https://github.com/eligrey/FileSaver.js>
-*   Export to javascript:	<http://evidenceprime.github.io/html-docx-js>
+*   Export to docx:			<http://evidenceprime.github.io/html-docx-js>
 *   Other javascript stuff: <https://jquery.com>

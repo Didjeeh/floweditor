@@ -64,9 +64,9 @@ When you are ready you can *close this help* by clicking the button in the upper
 
 ![](https://i.imgur.com/8uza0v1.png)
 
-And you can *edit* and *save* this flow or *open another*.
+And you can *edit* and *save* this flow or *open another*, and *export* as Word document (docx) or as image.
 
-![](https://i.imgur.com/uIfLhzf.png)
+![](https://i.imgur.com/qjHKZM0.png)
 
 When you click the *Edit* button you will see following 2 buttons and an edit field.
 
